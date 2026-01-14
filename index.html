@@ -3,16 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Lorem ipsum dolor sit amet consectetur adipiscing elit">
+  <meta name="description" content="Lorem ipsum dolor sit amet">
   <title>Gabrielle Emem Harry</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <a href="#main" class="sr-only">Skip to Content</a>
 
+  <!-- Fixed vertical side nav -->
+  <aside class="side-nav">
+    <span class="side-nav-text">scroll</span>
+    <div class="side-nav-line"></div>
+  </aside>
+
   <!-- Navigation -->
   <header class="nav">
-    <a href="index.html" class="nav-logo">gabrielleememharry.com</a>
+    <a href="index.html" class="nav-logo">GEH</a>
     <nav>
       <ul class="nav-links" id="navLinks">
         <li><a href="info.html">Info</a></li>
@@ -26,72 +32,186 @@
     </button>
   </header>
 
-  <main id="main" class="main">
-    <div class="container">
-      
-      <!-- Hero -->
-      <section class="hero">
-        <div class="hero-name">
-          <h1>
-            <span>gabrielle</span>
-            <span class="middle">emem</span>
-            <span>harry</span>
+  <main id="main">
+    <!-- HERO: Asymmetric split with overlapping elements -->
+    <section class="hero">
+      <!-- Left panel: Typography -->
+      <div class="hero-left">
+        <div class="hero-name-wrapper">
+          <h1 class="hero-name">
+            <span class="name-line name-first" data-text="gabrielle">
+              <span class="name-inner">gabrielle</span>
+            </span>
+            <span class="name-line name-middle">
+              <span class="name-inner">emem</span>
+            </span>
+            <span class="name-line name-last" data-text="harry">
+              <span class="name-inner">harry</span>
+            </span>
           </h1>
         </div>
-        <div class="hero-image-wrap">
-          <img src="images/headshot.svg" alt="Portrait of Gabrielle Emem Harry">
-          <p class="photo-credit">photo by Lorem Ipsum, Lagos</p>
+        
+        <!-- Floating accent block -->
+        <div class="hero-accent-block"></div>
+        
+        <!-- Role descriptor -->
+        <p class="hero-role">
+          <span class="role-line"></span>
+          <span class="role-text">lorem ipsum</span>
+        </p>
+      </div>
+      
+      <!-- Right panel: Image -->
+      <div class="hero-right">
+        <div class="hero-image-container">
+          <div class="hero-image-wrapper">
+            <img src="images/headshot.svg" alt="Portrait" class="hero-image">
+          </div>
+          <!-- Overlapping teal rectangle -->
+          <div class="hero-image-overlay"></div>
         </div>
-      </section>
+        <p class="photo-credit">photo by Lorem Ipsum, Lagos</p>
+      </div>
+      
+      <!-- Name that bleeds across both panels -->
+      <div class="hero-bleed-text" aria-hidden="true">writer</div>
+    </section>
 
-      <!-- Intro -->
-      <section class="intro">
-        <p class="intro-text">
-          lorem ipsum dolor sit amet, consectetur adipiscing elit. sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-        </p>
-        <a href="mailto:hello@gabrielleememharry.com" class="intro-email">hello@gabrielleememharry.com</a>
-      </section>
+    <!-- INTRO: Editorial grid layout -->
+    <section class="intro">
+      <div class="intro-container">
+        <div class="intro-marker">
+          <span class="marker-number">01</span>
+          <span class="marker-line"></span>
+        </div>
+        <div class="intro-content reveal">
+          <p class="intro-text">
+            <span class="intro-highlight">lorem ipsum</span> dolor sit amet, consectetur adipiscing elit. sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.
+          </p>
+          <a href="mailto:hello@gabrielleememharry.com" class="intro-email">
+            <span class="email-text">hello@gabrielleememharry.com</span>
+            <span class="email-arrow">→</span>
+          </a>
+        </div>
+      </div>
+    </section>
 
-      <!-- Newsletters -->
-      <section class="content-section">
-        <div class="section-label">lorem ipsum</div>
-        <p>lorem ipsum dolor sit amet!</p>
-        <p>
-          <a href="#" class="inline-link">Lorem Ipsum Dolor</a> consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-        </p>
-        <p>
-          <a href="#" class="inline-link">Sit Amet Consectetur</a> adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua, ut enim ad minim veniam quis nostrud exercitation ullamco laboris.
-        </p>
-      </section>
+    <!-- FEATURED: Asymmetric cards -->
+    <section class="featured">
+      <div class="featured-header">
+        <div class="featured-label">
+          <span class="label-text">lorem ipsum</span>
+        </div>
+      </div>
+      
+      <div class="featured-grid">
+        <article class="featured-card reveal">
+          <div class="card-number">01</div>
+          <div class="card-content">
+            <h3 class="card-title">
+              <a href="#">Lorem Ipsum Dolor</a>
+            </h3>
+            <p class="card-desc">Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+          </div>
+          <div class="card-accent"></div>
+        </article>
+        
+        <article class="featured-card reveal">
+          <div class="card-number">02</div>
+          <div class="card-content">
+            <h3 class="card-title">
+              <a href="#">Sit Amet Consectetur</a>
+            </h3>
+            <p class="card-desc">Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip.</p>
+          </div>
+          <div class="card-accent"></div>
+        </article>
+      </div>
+    </section>
 
-      <!-- Podcast -->
-      <section class="content-section">
-        <div class="section-label">& lorem</div>
-        <p>
-          lorem ipsum, Dolor Sit Amet, consectetur adipiscing elit! Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat duis aute irure dolor in reprehenderit.
-        </p>
-      </section>
-
-    </div>
+    <!-- PODCAST: Full-width dramatic section -->
+    <section class="dramatic">
+      <div class="dramatic-bg"></div>
+      <div class="dramatic-content">
+        <div class="dramatic-label">
+          <span>& lorem</span>
+        </div>
+        <div class="dramatic-text reveal">
+          <p>
+            lorem ipsum, <em>Dolor Sit Amet</em>, consectetur adipiscing elit. vivamus lacinia odio vitae vestibulum vestibulum. cras porttitor metus justo, ut fringilla velit fermentum.
+          </p>
+        </div>
+        <div class="dramatic-decoration">
+          <span class="deco-text">lorem</span>
+        </div>
+      </div>
+    </section>
   </main>
 
-  <!-- Footer -->
+  <!-- FOOTER -->
   <footer class="footer">
-    <div class="container">
+    <div class="footer-content">
       <a href="mailto:hello@gabrielleememharry.com" class="footer-email">hello@gabrielleememharry.com</a>
       <div class="footer-links">
-        <a href="#">instagram</a>, <a href="mailto:hello@gabrielleememharry.com">email</a>
+        <a href="#">instagram</a>
+        <span class="footer-sep">/</span>
+        <a href="mailto:hello@gabrielleememharry.com">email</a>
       </div>
     </div>
+    <div class="footer-name" aria-hidden="true">GEH</div>
   </footer>
 
   <script>
+    // Mobile menu toggle
     const navToggle = document.getElementById('navToggle');
     const navLinks = document.getElementById('navLinks');
     
     navToggle.addEventListener('click', () => {
       navToggle.classList.toggle('open');
       navLinks.classList.toggle('open');
+    });
+
+    // Scroll reveal animations
+    const reveals = document.querySelectorAll('.reveal');
+    const observerOptions = {
+      threshold: 0.15,
+      rootMargin: '0px 0px -50px 0px'
+    };
+    
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, observerOptions);
+    
+    reveals.forEach(el => revealObserver.observe(el));
+
+    // Parallax effect on hero image
+    const heroImage = document.querySelector('.hero-image-wrapper');
+    const heroAccent = document.querySelector('.hero-accent-block');
+    
+    window.addEventListener('scroll', () => {
+      const scrolled = window.pageYOffset;
+      const rate = scrolled * 0.3;
+      
+      if (heroImage && scrolled < window.innerHeight) {
+        heroImage.style.transform = `translateY(${rate * 0.5}px)`;
+      }
+      if (heroAccent && scrolled < window.innerHeight) {
+        heroAccent.style.transform = `translate(-50%, ${-50 + rate * 0.2}%)`;
+      }
+    });
+
+    // Name letters animation on load
+    document.addEventListener('DOMContentLoaded', () => {
+      const nameLines = document.querySelectorAll('.name-line');
+      nameLines.forEach((line, i) => {
+        setTimeout(() => {
+          line.classList.add('visible');
+        }, 200 + (i * 150));
+      });
     });
   </script>
 </body>

@@ -4,8 +4,9 @@
    3D Spiral Portfolio
    ============================================ */
 
-/* Fonts - Distinctive choices */
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,500&family=DM+Sans:ital,wght@0,400;0,500;1,400&display=swap');
+/* Fonts - Clash Display (headers) + Space Grotesk (body) */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+@import url('https://api.fontshare.com/v2/css?f[]=clash-display@200,300,400,500,600,700&display=swap');
 
 /* ============================================
    CSS VARIABLES
@@ -26,8 +27,8 @@
   --green-yellow: #AAB952;
   
   /* Typography */
-  --font-display: 'Cormorant Garamond', Georgia, serif;
-  --font-body: 'DM Sans', -apple-system, sans-serif;
+  --font-display: 'Clash Display', 'Helvetica Neue', sans-serif;
+  --font-body: 'Space Grotesk', -apple-system, sans-serif;
   
   /* Timing */
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
@@ -105,9 +106,9 @@ img {
 
 .nav-logo {
   font-family: var(--font-display);
-  font-size: 1.2rem;
-  font-weight: 600;
-  letter-spacing: 0.05em;
+  font-size: 1.1rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
   color: var(--off-white);
   transition: opacity 0.3s ease;
 }
@@ -120,7 +121,7 @@ img {
   font-family: var(--font-body);
   font-size: 0.85rem;
   font-weight: 500;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   text-transform: lowercase;
   color: var(--off-white);
   position: relative;
@@ -151,7 +152,7 @@ img {
 }
 
 .section {
-  min-height: 200vh; /* Extra height for scroll animation */
+  min-height: 200vh;
   position: relative;
 }
 
@@ -175,28 +176,23 @@ img {
   opacity: 0;
   z-index: 10;
   pointer-events: none;
+  width: 90%;
+  max-width: 1200px;
 }
 
 .name {
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: clamp(3rem, 10vw, 8rem);
-  line-height: 0.9;
-  letter-spacing: -0.03em;
+  font-size: clamp(2.2rem, 7vw, 6rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
   color: var(--deep-brown);
+  text-transform: lowercase;
+  white-space: nowrap;
 }
 
 .name-line {
   display: block;
-}
-
-.name-line:nth-child(2) {
-  font-style: italic;
-  font-weight: 400;
-  color: var(--teal);
-  font-size: 0.7em;
-  margin: 0.1em 0;
-  letter-spacing: 0.02em;
 }
 
 /* ============================================
@@ -208,17 +204,36 @@ img {
   align-items: flex-start;
   justify-content: center;
   padding: 10vh 0;
-  background: linear-gradient(180deg, transparent 0%, var(--off-white) 20%);
+  background: transparent;
 }
 
 .bio-container {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 6rem;
+  gap: 5rem;
   max-width: 1400px;
   width: 90%;
   padding: 4rem 0;
   margin-top: 30vh;
+  position: relative;
+}
+
+/* Decorative spiral frame - will be positioned via JS */
+.spiral-frame-container {
+  position: absolute;
+  top: -100px;
+  left: -150px;
+  width: 450px;
+  height: 450px;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+
+.photo-wrapper {
+  position: relative;
+  z-index: 1;
 }
 
 .photo-frame {
@@ -263,9 +278,11 @@ img {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 3rem;
+  gap: 2.5rem;
   opacity: 0;
   transition: opacity 0.8s ease, transform 0.8s var(--ease-out-expo);
+  position: relative;
+  z-index: 1;
 }
 
 .bio-block {
@@ -274,12 +291,11 @@ img {
 
 .bio-label {
   font-family: var(--font-display);
-  font-size: 1rem;
-  font-weight: 600;
-  font-style: italic;
+  font-size: 0.95rem;
+  font-weight: 500;
   color: var(--teal);
-  margin-bottom: 1rem;
-  letter-spacing: 0.02em;
+  margin-bottom: 0.85rem;
+  letter-spacing: 0.01em;
 }
 
 .bio-label::before {
@@ -289,15 +305,16 @@ img {
 
 .bio-text {
   font-family: var(--font-body);
-  font-size: 1.05rem;
-  line-height: 1.85;
+  font-size: 1rem;
+  line-height: 1.8;
   color: var(--deep-brown);
+  font-weight: 400;
 }
 
 .contact-link {
   font-family: var(--font-display);
-  font-size: 1.3rem;
-  font-style: italic;
+  font-size: 1.2rem;
+  font-weight: 500;
   color: var(--deep-brown);
   display: inline-flex;
   align-items: center;
@@ -372,6 +389,14 @@ img {
   .bio-content {
     padding: 0 1rem;
   }
+  
+  .spiral-frame-container {
+    top: -80px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 350px;
+    height: 350px;
+  }
 }
 
 @media (max-width: 768px) {
@@ -380,7 +405,9 @@ img {
   }
   
   .name {
-    font-size: clamp(2.5rem, 12vw, 5rem);
+    font-size: clamp(1.8rem, 8vw, 3.5rem);
+    white-space: normal;
+    text-align: center;
   }
   
   .bio-container {
@@ -388,19 +415,23 @@ img {
   }
   
   .bio-label {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
   }
   
   .bio-text {
-    font-size: 1rem;
+    font-size: 0.95rem;
   }
   
   .contact-link {
-    font-size: 1.1rem;
+    font-size: 1rem;
   }
   
   .footer {
     padding: 3rem 2rem;
+  }
+  
+  .spiral-frame-container {
+    display: none;
   }
 }
 
@@ -433,13 +464,12 @@ img {
 .works-title {
   font-family: var(--font-display);
   font-size: clamp(2.5rem, 6vw, 4rem);
-  font-weight: 700;
+  font-weight: 600;
   color: var(--cream);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
 }
 
 .works-title span {
-  font-style: italic;
   font-weight: 400;
   color: var(--gold);
 }
@@ -494,8 +524,8 @@ img {
 
 .section-label {
   font-family: var(--font-body);
-  font-size: 0.75rem;
-  font-weight: 500;
+  font-size: 0.7rem;
+  font-weight: 600;
   letter-spacing: 0.15em;
   text-transform: uppercase;
   color: var(--olive);
@@ -528,10 +558,9 @@ img {
 }
 
 .book-note {
-  font-family: var(--font-display);
-  font-style: italic;
+  font-family: var(--font-body);
   color: var(--olive);
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   margin-top: 0.25rem;
 }
 
@@ -576,10 +605,9 @@ img {
 }
 
 .publication-item .venue {
-  font-family: var(--font-display);
-  font-style: italic;
+  font-family: var(--font-body);
   color: var(--olive);
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   margin-top: 0.25rem;
 }
 
@@ -594,7 +622,7 @@ img {
 .art-category {
   font-family: var(--font-body);
   font-size: 0.7rem;
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--camel);
@@ -635,6 +663,7 @@ img {
 .art-title {
   font-family: var(--font-display);
   font-size: 0.95rem;
+  font-weight: 500;
   margin-top: 0.75rem;
   color: var(--deep-brown);
 }

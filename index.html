@@ -3,216 +3,435 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Lorem ipsum dolor sit amet">
+  <meta name="description" content="Gabrielle Emem Harry — Cultural Strategist & Writer">
   <title>Gabrielle Emem Harry</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <a href="#main" class="sr-only">Skip to Content</a>
-
-  <!-- Fixed vertical side nav -->
-  <aside class="side-nav">
-    <span class="side-nav-text">scroll</span>
-    <div class="side-nav-line"></div>
-  </aside>
-
   <!-- Navigation -->
   <header class="nav">
-    <a href="index.html" class="nav-logo">GEH</a>
+    <a href="index.html" class="nav-logo">geh</a>
     <nav>
-      <ul class="nav-links" id="navLinks">
-        <li><a href="info.html">Info</a></li>
-        <li><a href="works.html">Select Works</a></li>
-      </ul>
+      <a href="works.html" class="nav-link">works</a>
     </nav>
-    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
-      <span></span>
-      <span></span>
-      <span></span>
-    </button>
   </header>
 
-  <main id="main">
-    <!-- HERO: Asymmetric split with overlapping elements -->
-    <section class="hero">
-      <!-- Left panel: Typography -->
-      <div class="hero-left">
-        <div class="hero-name-wrapper">
-          <h1 class="hero-name">
-            <span class="name-line name-first" data-text="gabrielle">
-              <span class="name-inner">gabrielle</span>
-            </span>
-            <span class="name-line name-middle">
-              <span class="name-inner">emem</span>
-            </span>
-            <span class="name-line name-last" data-text="harry">
-              <span class="name-inner">harry</span>
-            </span>
-          </h1>
-        </div>
-        
-        <!-- Floating accent block -->
-        <div class="hero-accent-block"></div>
-        
-        <!-- Role descriptor -->
-        <p class="hero-role">
-          <span class="role-line"></span>
-          <span class="role-text">lorem ipsum</span>
-        </p>
+  <!-- Three.js Canvas Container -->
+  <div id="spiral-container"></div>
+
+  <!-- Scroll Container -->
+  <div class="scroll-container">
+    
+    <!-- Section 1: Spiral + Name -->
+    <section class="section section-spiral" id="section-spiral">
+      <div class="name-reveal" id="name-reveal">
+        <h1 class="name">
+          <span class="name-line">gabrielle</span>
+          <span class="name-line">emem</span>
+          <span class="name-line">harry</span>
+        </h1>
       </div>
-      
-      <!-- Right panel: Image -->
-      <div class="hero-right">
-        <div class="hero-image-container">
-          <div class="hero-image-wrapper">
-            <img src="images/headshot.svg" alt="Portrait" class="hero-image">
-          </div>
-          <!-- Overlapping teal rectangle -->
-          <div class="hero-image-overlay"></div>
-        </div>
-        <p class="photo-credit">photo by Lorem Ipsum, Lagos</p>
-      </div>
-      
-      <!-- Name that bleeds across both panels -->
-      <div class="hero-bleed-text" aria-hidden="true">writer</div>
     </section>
 
-    <!-- INTRO: Editorial grid layout -->
-    <section class="intro">
-      <div class="intro-container">
-        <div class="intro-marker">
-          <span class="marker-number">01</span>
-          <span class="marker-line"></span>
+    <!-- Section 2: Photo + Bio -->
+    <section class="section section-bio" id="section-bio">
+      <div class="bio-container">
+        <!-- Spiral Frame placeholder - Three.js will handle this -->
+        <div class="photo-frame" id="photo-frame">
+          <img src="images/gabrielle.jpg" alt="Gabrielle Emem Harry" class="photo">
         </div>
-        <div class="intro-content reveal">
-          <p class="intro-text">
-            <span class="intro-highlight">lorem ipsum</span> dolor sit amet, consectetur adipiscing elit. sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.
-          </p>
-          <a href="mailto:hello@gabrielleememharry.com" class="intro-email">
-            <span class="email-text">hello@gabrielleememharry.com</span>
-            <span class="email-arrow">→</span>
+        
+        <div class="bio-content" id="bio-content">
+          <div class="bio-block">
+            <h2 class="bio-label">as a cultural strategist</h2>
+            <p class="bio-text">
+              I work at the intersection of Digital Humanities and African Arts & Culture. I'm interested in art, cultural programming and digital interventions which increase access to historical and contemporary African and Afro-diasporic knowledge, foster creative community, fuel cultural dynamism and drive social change.
+            </p>
+          </div>
+          
+          <div class="bio-block">
+            <h2 class="bio-label">as a writer</h2>
+            <p class="bio-text">
+              I have won the 2024 Nommo Short Story Award, been shortlisted for the 2024 Writivism Short Story Prize, longlisted for the 2025 BSFA award, selected as a 2024 Voodoonauts Fellow and a 2023 LLEAA Fellow. My work has appeared or is forthcoming in Strange Horizons, Logic(s), The Year's Best African Speculative Fiction Volume 3, Afterlives: The Year's Best Death Fiction, the Flametree Press African Short Ghost Stories Anthology, Omenana, Apparition, Isele and more.
+            </p>
+          </div>
+
+          <a href="mailto:hello@gabrielleememharry.com" class="contact-link">
+            hello@gabrielleememharry.com
           </a>
         </div>
       </div>
     </section>
 
-    <!-- FEATURED: Asymmetric cards -->
-    <section class="featured">
-      <div class="featured-header">
-        <div class="featured-label">
-          <span class="label-text">lorem ipsum</span>
-        </div>
-      </div>
-      
-      <div class="featured-grid">
-        <article class="featured-card reveal">
-          <div class="card-number">01</div>
-          <div class="card-content">
-            <h3 class="card-title">
-              <a href="#">Lorem Ipsum Dolor</a>
-            </h3>
-            <p class="card-desc">Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-          </div>
-          <div class="card-accent"></div>
-        </article>
-        
-        <article class="featured-card reveal">
-          <div class="card-number">02</div>
-          <div class="card-content">
-            <h3 class="card-title">
-              <a href="#">Sit Amet Consectetur</a>
-            </h3>
-            <p class="card-desc">Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip.</p>
-          </div>
-          <div class="card-accent"></div>
-        </article>
-      </div>
-    </section>
+  </div>
 
-    <!-- PODCAST: Full-width dramatic section -->
-    <section class="dramatic">
-      <div class="dramatic-bg"></div>
-      <div class="dramatic-content">
-        <div class="dramatic-label">
-          <span>& lorem</span>
-        </div>
-        <div class="dramatic-text reveal">
-          <p>
-            lorem ipsum, <em>Dolor Sit Amet</em>, consectetur adipiscing elit. vivamus lacinia odio vitae vestibulum vestibulum. cras porttitor metus justo, ut fringilla velit fermentum.
-          </p>
-        </div>
-        <div class="dramatic-decoration">
-          <span class="deco-text">lorem</span>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <!-- FOOTER -->
+  <!-- Footer -->
   <footer class="footer">
-    <div class="footer-content">
-      <a href="mailto:hello@gabrielleememharry.com" class="footer-email">hello@gabrielleememharry.com</a>
-      <div class="footer-links">
-        <a href="#">instagram</a>
-        <span class="footer-sep">/</span>
-        <a href="mailto:hello@gabrielleememharry.com">email</a>
-      </div>
+    <div class="footer-inner">
+      <a href="mailto:hello@gabrielleememharry.com">email</a>
+      <span class="footer-sep">·</span>
+      <a href="works.html">works</a>
     </div>
-    <div class="footer-name" aria-hidden="true">GEH</div>
   </footer>
 
+  <!-- Three.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  
   <script>
-    // Mobile menu toggle
-    const navToggle = document.getElementById('navToggle');
-    const navLinks = document.getElementById('navLinks');
-    
-    navToggle.addEventListener('click', () => {
-      navToggle.classList.toggle('open');
-      navLinks.classList.toggle('open');
-    });
-
-    // Scroll reveal animations
-    const reveals = document.querySelectorAll('.reveal');
-    const observerOptions = {
-      threshold: 0.15,
-      rootMargin: '0px 0px -50px 0px'
+    // ============================================
+    // CONFIGURATION
+    // ============================================
+    const CONFIG = {
+      colors: {
+        spiral: [
+          '#F8B800', // Gold
+          '#D5D170', // Lime yellow  
+          '#008080', // Teal
+          '#AAB952', // Green-yellow
+          '#F8B800', // Back to gold
+        ],
+        background: '#FAF7F2'
+      },
+      spiral: {
+        turns: 6,
+        segments: 800,
+        maxRadius: 3,
+        minRadius: 0.05,
+        depth: 5,
+        tubeRadius: 0.04
+      }
     };
-    
-    const revealObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-        }
-      });
-    }, observerOptions);
-    
-    reveals.forEach(el => revealObserver.observe(el));
 
-    // Parallax effect on hero image
-    const heroImage = document.querySelector('.hero-image-wrapper');
-    const heroAccent = document.querySelector('.hero-accent-block');
+    // ============================================
+    // THREE.JS SETUP
+    // ============================================
+    let scene, camera, renderer;
+    let spiralMesh;
+    let spiralGroup;
+    let particles;
+    let scrollProgress = 0;
+    let targetScrollProgress = 0;
+    let time = 0;
     
-    window.addEventListener('scroll', () => {
-      const scrolled = window.pageYOffset;
-      const rate = scrolled * 0.3;
+    const container = document.getElementById('spiral-container');
+    
+    function init() {
+      // Scene
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(CONFIG.colors.background);
       
-      if (heroImage && scrolled < window.innerHeight) {
-        heroImage.style.transform = `translateY(${rate * 0.5}px)`;
-      }
-      if (heroAccent && scrolled < window.innerHeight) {
-        heroAccent.style.transform = `translate(-50%, ${-50 + rate * 0.2}%)`;
-      }
-    });
-
-    // Name letters animation on load
-    document.addEventListener('DOMContentLoaded', () => {
-      const nameLines = document.querySelectorAll('.name-line');
-      nameLines.forEach((line, i) => {
-        setTimeout(() => {
-          line.classList.add('visible');
-        }, 200 + (i * 150));
+      // Camera - positioned to look into the vortex
+      camera = new THREE.PerspectiveCamera(
+        50,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        1000
+      );
+      camera.position.z = 6;
+      camera.position.y = 0;
+      
+      // Renderer
+      renderer = new THREE.WebGLRenderer({ 
+        antialias: true,
+        alpha: true 
       });
-    });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      container.appendChild(renderer.domElement);
+      
+      // Create spiral group
+      spiralGroup = new THREE.Group();
+      scene.add(spiralGroup);
+      
+      // Create main spiral
+      createSpiral();
+      
+      // Create particle dust
+      createParticles();
+      
+      // Subtle lighting
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+      scene.add(ambientLight);
+      
+      const pointLight = new THREE.PointLight(0xF8B800, 0.5, 20);
+      pointLight.position.set(0, 0, 3);
+      scene.add(pointLight);
+      
+      // Events
+      window.addEventListener('resize', onResize);
+      window.addEventListener('scroll', onScroll);
+      
+      // Initial scroll check
+      onScroll();
+      
+      // Animate
+      animate();
+    }
+
+    function createSpiral() {
+      const { turns, segments, maxRadius, minRadius, depth, tubeRadius } = CONFIG.spiral;
+      
+      // Create spiral curve
+      const points = [];
+      for (let i = 0; i <= segments; i++) {
+        const t = i / segments;
+        const angle = t * turns * Math.PI * 2;
+        
+        // Logarithmic spiral for more natural vortex feel
+        const radius = maxRadius * Math.pow(minRadius / maxRadius, t);
+        
+        const x = Math.cos(angle) * radius;
+        const y = Math.sin(angle) * radius;
+        const z = -t * depth;
+        
+        points.push(new THREE.Vector3(x, y, z));
+      }
+      
+      const curve = new THREE.CatmullRomCurve3(points);
+      
+      // Create tube geometry along the spiral
+      const tubeGeometry = new THREE.TubeGeometry(curve, segments, tubeRadius, 8, false);
+      
+      // Create gradient material using vertex colors
+      const colors = [];
+      const positions = tubeGeometry.attributes.position;
+      
+      for (let i = 0; i < positions.count; i++) {
+        const z = positions.getZ(i);
+        const t = Math.abs(z) / depth;
+        
+        // Get color from gradient
+        const colorIndex = t * (CONFIG.colors.spiral.length - 1);
+        const idx1 = Math.floor(colorIndex);
+        const idx2 = Math.min(idx1 + 1, CONFIG.colors.spiral.length - 1);
+        const blend = colorIndex - idx1;
+        
+        const c1 = new THREE.Color(CONFIG.colors.spiral[idx1]);
+        const c2 = new THREE.Color(CONFIG.colors.spiral[idx2]);
+        const color = c1.lerp(c2, blend);
+        
+        colors.push(color.r, color.g, color.b);
+      }
+      
+      tubeGeometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+      
+      // Material with vertex colors
+      const material = new THREE.MeshBasicMaterial({
+        vertexColors: true,
+        transparent: true,
+        opacity: 1,
+        side: THREE.DoubleSide
+      });
+      
+      spiralMesh = new THREE.Mesh(tubeGeometry, material);
+      spiralGroup.add(spiralMesh);
+      
+      // Add outer glow lines
+      for (let i = 0; i < 3; i++) {
+        const lineGeometry = new THREE.BufferGeometry().setFromPoints(points);
+        const lineMaterial = new THREE.LineBasicMaterial({
+          color: new THREE.Color(CONFIG.colors.spiral[i % CONFIG.colors.spiral.length]),
+          transparent: true,
+          opacity: 0.3 - i * 0.08,
+          linewidth: 1
+        });
+        const line = new THREE.Line(lineGeometry, lineMaterial);
+        line.scale.set(1 + i * 0.05, 1 + i * 0.05, 1);
+        spiralGroup.add(line);
+      }
+    }
+
+    function createParticles() {
+      const particleCount = 200;
+      const positions = [];
+      const colors = [];
+      const sizes = [];
+      
+      for (let i = 0; i < particleCount; i++) {
+        // Position along and around the spiral
+        const t = Math.random();
+        const angle = t * CONFIG.spiral.turns * Math.PI * 2;
+        const baseRadius = CONFIG.spiral.maxRadius * Math.pow(CONFIG.spiral.minRadius / CONFIG.spiral.maxRadius, t);
+        
+        // Offset from the spiral
+        const offset = (Math.random() - 0.5) * 1.5;
+        const radius = baseRadius + offset;
+        
+        const x = Math.cos(angle) * radius;
+        const y = Math.sin(angle) * radius;
+        const z = -t * CONFIG.spiral.depth + (Math.random() - 0.5) * 0.5;
+        
+        positions.push(x, y, z);
+        
+        // Color
+        const color = new THREE.Color(CONFIG.colors.spiral[Math.floor(Math.random() * CONFIG.colors.spiral.length)]);
+        colors.push(color.r, color.g, color.b);
+        
+        // Size
+        sizes.push(Math.random() * 3 + 1);
+      }
+      
+      const geometry = new THREE.BufferGeometry();
+      geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+      geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+      geometry.setAttribute('size', new THREE.Float32BufferAttribute(sizes, 1));
+      
+      const material = new THREE.PointsMaterial({
+        size: 0.05,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.6,
+        sizeAttenuation: true
+      });
+      
+      particles = new THREE.Points(geometry, material);
+      spiralGroup.add(particles);
+    }
+
+    // ============================================
+    // SCROLL HANDLING
+    // ============================================
+    function onScroll() {
+      const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+      targetScrollProgress = scrollHeight > 0 ? window.scrollY / scrollHeight : 0;
+    }
+
+    function updateScene() {
+      time += 0.01;
+      
+      // Smooth scroll interpolation
+      scrollProgress += (targetScrollProgress - scrollProgress) * 0.08;
+      
+      // Phase definitions
+      const phase1End = 0.35;      // Spiral draws
+      const phase2Start = 0.2;    // Name starts appearing
+      const phase2End = 0.45;      // Name fully visible
+      const phase3Start = 0.45;    // Transition begins
+      const phase3End = 0.75;      // Transition complete
+      
+      // Phase 1: Draw and rotate spiral (0 - 0.35)
+      const drawProgress = Math.min(scrollProgress / phase1End, 1);
+      
+      // Spiral visibility based on scroll
+      if (spiralMesh) {
+        // Animate spiral rotation
+        spiralGroup.rotation.z = drawProgress * Math.PI * 1.5 + time * 0.1;
+        
+        // Gentle wobble
+        spiralGroup.rotation.x = Math.sin(time * 0.5) * 0.05;
+        spiralGroup.rotation.y = Math.cos(time * 0.3) * 0.05;
+        
+        // Scale based on scroll
+        const scale = 0.3 + drawProgress * 0.7;
+        spiralGroup.scale.set(scale, scale, scale);
+        
+        // Move camera slightly into the vortex
+        camera.position.z = 6 - drawProgress * 1.5;
+      }
+      
+      // Particle animation
+      if (particles) {
+        particles.rotation.z = time * 0.05;
+        particles.material.opacity = 0.4 + Math.sin(time) * 0.2;
+      }
+      
+      // Phase 2: Name reveal (0.2 - 0.45)
+      const nameReveal = document.getElementById('name-reveal');
+      if (scrollProgress >= phase2Start && scrollProgress <= phase2End) {
+        const nameProgress = (scrollProgress - phase2Start) / (phase2End - phase2Start);
+        const eased = easeOutCubic(nameProgress);
+        nameReveal.style.opacity = eased;
+        nameReveal.style.transform = `translate(-50%, -50%) translateY(${(1 - eased) * 40}px)`;
+      } else if (scrollProgress < phase2Start) {
+        nameReveal.style.opacity = 0;
+        nameReveal.style.transform = 'translate(-50%, -50%) translateY(40px)';
+      } else if (scrollProgress <= phase3End) {
+        nameReveal.style.opacity = 1;
+        nameReveal.style.transform = 'translate(-50%, -50%) translateY(0)';
+      }
+      
+      // Phase 3: Transition to bio section (0.45 - 0.75)
+      if (scrollProgress >= phase3Start) {
+        const transitionProgress = Math.min((scrollProgress - phase3Start) / (phase3End - phase3Start), 1);
+        const eased = easeOutCubic(transitionProgress);
+        
+        // Fade and move spiral
+        spiralGroup.material && (spiralGroup.material.opacity = 1 - eased);
+        spiralMesh.material.opacity = 1 - eased * 0.8;
+        
+        // Move spiral to left
+        spiralGroup.position.x = -eased * 8;
+        spiralGroup.position.y = eased * 2;
+        spiralGroup.scale.set(
+          (1 - eased * 0.6), 
+          (1 - eased * 0.6), 
+          (1 - eased * 0.6)
+        );
+        
+        // Fade out name
+        if (transitionProgress > 0.3) {
+          const nameFade = (transitionProgress - 0.3) / 0.7;
+          nameReveal.style.opacity = 1 - nameFade;
+        }
+        
+        // Camera movement
+        camera.position.x = eased * 0.5;
+      } else {
+        spiralGroup.position.x = 0;
+        spiralGroup.position.y = 0;
+        spiralMesh.material.opacity = 1;
+        camera.position.x = 0;
+      }
+      
+      // Phase 4: Bio content reveal (0.65 - 1)
+      const bioContent = document.getElementById('bio-content');
+      const photoFrame = document.getElementById('photo-frame');
+      const bioStart = 0.65;
+      
+      if (scrollProgress >= bioStart) {
+        const bioProgress = Math.min((scrollProgress - bioStart) / 0.25, 1);
+        const eased = easeOutCubic(bioProgress);
+        
+        bioContent.style.opacity = eased;
+        bioContent.style.transform = `translateX(${(1 - eased) * 60}px)`;
+        
+        photoFrame.style.opacity = eased;
+        photoFrame.style.transform = `translateX(${(1 - eased) * -60}px) scale(${0.9 + eased * 0.1})`;
+      } else {
+        bioContent.style.opacity = 0;
+        bioContent.style.transform = 'translateX(60px)';
+        photoFrame.style.opacity = 0;
+        photoFrame.style.transform = 'translateX(-60px) scale(0.9)';
+      }
+    }
+    
+    // Easing function
+    function easeOutCubic(t) {
+      return 1 - Math.pow(1 - t, 3);
+    }
+
+    // ============================================
+    // ANIMATION LOOP
+    // ============================================
+    function animate() {
+      requestAnimationFrame(animate);
+      updateScene();
+      renderer.render(scene, camera);
+    }
+
+    // ============================================
+    // RESIZE
+    // ============================================
+    function onResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    // ============================================
+    // INIT
+    // ============================================
+    init();
   </script>
 </body>
 </html>

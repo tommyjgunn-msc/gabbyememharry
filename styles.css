@@ -271,6 +271,15 @@ img {
   filter: grayscale(20%) contrast(1.05);
 }
 
+.photo-caption {
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--gold);
+  margin-top: 1.25rem;
+  letter-spacing: 0.02em;
+}
+
 .bio-content {
   display: flex;
   flex-direction: column;
@@ -286,18 +295,12 @@ img {
   max-width: 550px;
 }
 
-.bio-label {
-  font-family: var(--font-display);
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: var(--gold);
-  margin-bottom: 0.85rem;
-  letter-spacing: 0.01em;
+.bio-block .bio-text {
+  margin-bottom: 1.5rem;
 }
 
-.bio-label::before {
-  content: '— ';
-  color: var(--rust);
+.bio-block .bio-text:last-of-type {
+  margin-bottom: 0;
 }
 
 .bio-text {

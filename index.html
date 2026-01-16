@@ -151,15 +151,17 @@
       scene = new THREE.Scene();
       scene.background = new THREE.Color(CONFIG.colors.background);
       
-      // Camera - start further back
+      // Camera - start above and back, looking down at galaxy
       camera = new THREE.PerspectiveCamera(
         60,
         window.innerWidth / window.innerHeight,
         0.1,
         1000
       );
-      camera.position.z = 12;
-      camera.position.y = 0;
+      camera.position.z = 14;
+      camera.position.y = 5;
+      camera.position.x = 0;
+      camera.lookAt(0, -0.5, 0); // Look down at galaxy center
       
       // Renderer
       renderer = new THREE.WebGLRenderer({ 
@@ -574,19 +576,40 @@
       if (galaxyGroup) {
         galaxyGroup.rotation.y = time * 0.12;
         
-        // START face-on (flat), then tilt slightly AS we dive in
-        // This creates the effect of diving INTO the galaxy plane
-        galaxyGroup.rotation.x = -0.1 - easedZoom * 0.2; // Slight forward tilt
+        // Galaxy stays relatively flat - camera does the moving
+        galaxyGroup.rotation.x = 0;
         
         // SCALE UP dramatically as we zoom - galaxy spreads beyond screen
         const baseScale = 0.5;
-        const zoomScale = easedZoom * 1.8; // Gets much bigger
+        const zoomScale = easedZoom * 1.8;
         const scale = baseScale + zoomScale;
         galaxyGroup.scale.set(scale, scale, scale);
         
-        // Camera moves FORWARD into the galaxy (z decreases toward 0)
-        // This makes stars spread outward past screen edges
-        camera.position.z = 12 - easedZoom * 9; // 12 -> 3
+        // =============================================
+        // PARABOLIC CAMERA ARC
+        // Start: above and far (y=5, z=14) looking down
+        // End: level and close (y=0.5, z=3) looking into center
+        // =============================================
+        
+        // Camera Z: move forward into galaxy
+        const startZ = 14;
+        const endZ = 3;
+        camera.position.z = startZ - easedZoom * (startZ - endZ);
+        
+        // Camera Y: parabolic descent from above
+        // Using (1 - t)^2 creates a parabola that drops slowly at first, then faster
+        // We invert it: 1 - (1-t)^2 = drops fast at first, then levels out
+        const startY = 5;
+        const endY = 0.3;
+        const parabolicT = 1 - Math.pow(1 - easedZoom, 2); // Fast drop, slow finish
+        camera.position.y = startY - parabolicT * (startY - endY);
+        
+        // Camera X: slight lateral drift for dynamism (optional subtle touch)
+        camera.position.x = Math.sin(easedZoom * Math.PI * 0.3) * 0.5;
+        
+        // Point camera at galaxy center (slightly ahead of actual center for smooth tracking)
+        const lookAtY = -0.5 + easedZoom * 0.5; // Start looking down, end looking level
+        camera.lookAt(0, lookAtY, 0);
       }
       
       // Background stars - subtle parallax drift
@@ -608,7 +631,7 @@
         
         // Dim core as name appears so text is readable
         if (coreParticles) {
-          coreParticles.material.opacity = 0.75 * (1 - eased * 0.6); // Dims to 30% of original
+          coreParticles.material.opacity = 0.75 * (1 - eased * 0.6);
         }
         
       } else if (scrollProgress < phase2Start) {
@@ -643,7 +666,11 @@
         // Galaxy continues expanding but fading
         const expandScale = (0.5 + 1.8) * (1 + eased * 0.3);
         galaxyGroup.scale.set(expandScale, expandScale, expandScale);
-        camera.position.z = 3 - eased * 2; // Continue moving forward
+        
+        // Camera continues forward and settles level
+        camera.position.z = 3 - eased * 2;
+        camera.position.y = 0.3 * (1 - eased);
+        camera.lookAt(0, 0, 0);
         
       } else if (scrollProgress < phase2Start) {
         // Reset opacities before name appears

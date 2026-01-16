@@ -83,26 +83,31 @@
   
   <script>
     // ============================================
-    // CONFIGURATION - BEEFED UP SPIRAL
+    // CONFIGURATION - GALAXY SPIRAL
     // ============================================
     const CONFIG = {
       colors: {
-        spiral: [
-          '#F8B800', // Gold
-          '#D5D170', // Lime yellow  
-          '#008080', // Teal
-          '#AAB952', // Green-yellow
-          '#F8B800', // Back to gold
-        ],
-        background: '#FAF7F2'
+        // New palette
+        gold: '#DEA450',
+        rust: '#9B461F',
+        wine: '#6A1D2F',
+        forest: '#354C3C',
+        // Gradient for spiral arms (outer to inner)
+        spiral: ['#DEA450', '#9B461F', '#6A1D2F', '#354C3C', '#27213C'],
+        background: '#27213C'
       },
-      spiral: {
-        turns: 10,           // More turns (was 6)
-        segments: 1200,      // More segments for smoothness
-        maxRadius: 3.5,      // Larger max radius
-        minRadius: 0.02,     // Tighter center
-        depth: 8,            // More dramatic depth into screen
-        tubeRadius: 0.065    // Thicker tube (was 0.04)
+      galaxy: {
+        arms: 2,              // Number of spiral arms
+        turns: 4,             // How tightly wound
+        maxRadius: 5,         // Outer edge
+        coreRadius: 0.3,      // Dense core size
+        armWidth: 0.8,        // How thick the arms are
+        particles: {
+          arms: 8000,         // Particles in spiral arms
+          core: 2000,         // Particles in central core
+          dust: 1500,         // Ambient dust particles
+          stars: 800          // Background stars
+        }
       }
     };
 
@@ -110,10 +115,8 @@
     // THREE.JS SETUP
     // ============================================
     let scene, camera, renderer;
-    let spiralMesh;
-    let spiralGroup;
-    let particles;
-    let innerSpirals = [];
+    let galaxyGroup;
+    let armParticles, coreParticles, dustParticles, starParticles;
     let scrollProgress = 0;
     let targetScrollProgress = 0;
     let time = 0;
@@ -124,19 +127,42 @@
     
     const container = document.getElementById('spiral-container');
     
+    // Create soft circular texture for particles
+    function createParticleTexture(size, softness) {
+      const canvas = document.createElement('canvas');
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      
+      const center = size / 2;
+      const gradient = ctx.createRadialGradient(center, center, 0, center, center, center);
+      
+      gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
+      gradient.addColorStop(softness, 'rgba(255, 255, 255, 0.5)');
+      gradient.addColorStop(0.7, 'rgba(255, 255, 255, 0.1)');
+      gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+      
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, size, size);
+      
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.needsUpdate = true;
+      return texture;
+    }
+    
     function init() {
       // Scene
       scene = new THREE.Scene();
       scene.background = new THREE.Color(CONFIG.colors.background);
       
-      // Camera - positioned to look into the vortex
+      // Camera
       camera = new THREE.PerspectiveCamera(
-        50,
+        60,
         window.innerWidth / window.innerHeight,
         0.1,
         1000
       );
-      camera.position.z = 7;
+      camera.position.z = 8;
       camera.position.y = 0;
       
       // Renderer
@@ -148,26 +174,15 @@
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       container.appendChild(renderer.domElement);
       
-      // Create spiral group
-      spiralGroup = new THREE.Group();
-      scene.add(spiralGroup);
+      // Create galaxy group
+      galaxyGroup = new THREE.Group();
+      scene.add(galaxyGroup);
       
-      // Create main spiral
-      createSpiral();
-      
-      // Create inner density spirals for more weight
-      createInnerSpirals();
-      
-      // Create particle dust
-      createParticles();
-      
-      // Subtle lighting
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-      scene.add(ambientLight);
-      
-      const pointLight = new THREE.PointLight(0xF8B800, 0.6, 25);
-      pointLight.position.set(0, 0, 4);
-      scene.add(pointLight);
+      // Create galaxy layers
+      createBackgroundStars();
+      createGalaxyCore();
+      createSpiralArms();
+      createDustLayer();
       
       // Initialize frame spiral (for bio section)
       initFrameSpiral();
@@ -183,185 +198,246 @@
       animate();
     }
 
-    function createSpiral() {
-      const { turns, segments, maxRadius, minRadius, depth, tubeRadius } = CONFIG.spiral;
+    // Background stars - tiny, sharp points
+    function createBackgroundStars() {
+      const count = CONFIG.galaxy.particles.stars;
+      const positions = new Float32Array(count * 3);
+      const colors = new Float32Array(count * 3);
+      const sizes = new Float32Array(count);
       
-      // Create spiral curve with tighter coiling
-      const points = [];
-      for (let i = 0; i <= segments; i++) {
-        const t = i / segments;
-        const angle = t * turns * Math.PI * 2;
+      for (let i = 0; i < count; i++) {
+        // Spread across a large sphere
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.acos(2 * Math.random() - 1);
+        const r = 15 + Math.random() * 20;
         
-        // Logarithmic spiral for natural vortex feel with tighter center
-        const radius = maxRadius * Math.pow(minRadius / maxRadius, t);
+        positions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+        positions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+        positions[i * 3 + 2] = r * Math.cos(phi) - 10;
         
-        const x = Math.cos(angle) * radius;
-        const y = Math.sin(angle) * radius;
-        const z = -t * depth;
-        
-        points.push(new THREE.Vector3(x, y, z));
-      }
-      
-      const curve = new THREE.CatmullRomCurve3(points);
-      
-      // Create tube geometry along the spiral - thicker tube
-      const tubeGeometry = new THREE.TubeGeometry(curve, segments, tubeRadius, 12, false);
-      
-      // Create gradient material using vertex colors
-      const colors = [];
-      const positions = tubeGeometry.attributes.position;
-      
-      for (let i = 0; i < positions.count; i++) {
-        const z = positions.getZ(i);
-        const t = Math.abs(z) / depth;
-        
-        // Get color from gradient
-        const colorIndex = t * (CONFIG.colors.spiral.length - 1);
-        const idx1 = Math.floor(colorIndex);
-        const idx2 = Math.min(idx1 + 1, CONFIG.colors.spiral.length - 1);
-        const blend = colorIndex - idx1;
-        
-        const c1 = new THREE.Color(CONFIG.colors.spiral[idx1]);
-        const c2 = new THREE.Color(CONFIG.colors.spiral[idx2]);
-        const color = c1.lerp(c2, blend);
-        
-        colors.push(color.r, color.g, color.b);
-      }
-      
-      tubeGeometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-      
-      // Material with vertex colors
-      const material = new THREE.MeshBasicMaterial({
-        vertexColors: true,
-        transparent: true,
-        opacity: 1,
-        side: THREE.DoubleSide
-      });
-      
-      spiralMesh = new THREE.Mesh(tubeGeometry, material);
-      spiralGroup.add(spiralMesh);
-      
-      // Add outer glow lines
-      for (let i = 0; i < 4; i++) {
-        const lineGeometry = new THREE.BufferGeometry().setFromPoints(points);
-        const lineMaterial = new THREE.LineBasicMaterial({
-          color: new THREE.Color(CONFIG.colors.spiral[i % CONFIG.colors.spiral.length]),
-          transparent: true,
-          opacity: 0.35 - i * 0.07,
-          linewidth: 1
-        });
-        const line = new THREE.Line(lineGeometry, lineMaterial);
-        line.scale.set(1 + i * 0.04, 1 + i * 0.04, 1);
-        spiralGroup.add(line);
-      }
-    }
-
-    // Create inner spirals for more visual density/gravity
-    function createInnerSpirals() {
-      const { turns, segments, maxRadius, minRadius, depth } = CONFIG.spiral;
-      
-      // Create 2 inner spirals with slight offsets
-      for (let s = 0; s < 2; s++) {
-        const points = [];
-        const radiusOffset = 0.85 - s * 0.15;
-        const phaseOffset = s * Math.PI * 0.3;
-        
-        for (let i = 0; i <= segments * 0.8; i++) {
-          const t = i / (segments * 0.8);
-          const angle = t * turns * Math.PI * 2 + phaseOffset;
-          
-          const radius = (maxRadius * radiusOffset) * Math.pow(minRadius / maxRadius, t);
-          
-          const x = Math.cos(angle) * radius;
-          const y = Math.sin(angle) * radius;
-          const z = -t * depth * 0.9;
-          
-          points.push(new THREE.Vector3(x, y, z));
+        // Mostly white/pale stars with occasional warm tints
+        const warmth = Math.random();
+        if (warmth > 0.9) {
+          colors[i * 3] = 1;
+          colors[i * 3 + 1] = 0.8;
+          colors[i * 3 + 2] = 0.6;
+        } else {
+          colors[i * 3] = 0.9 + Math.random() * 0.1;
+          colors[i * 3 + 1] = 0.9 + Math.random() * 0.1;
+          colors[i * 3 + 2] = 1;
         }
         
-        const curve = new THREE.CatmullRomCurve3(points);
-        const tubeGeometry = new THREE.TubeGeometry(curve, segments * 0.8, 0.035, 8, false);
-        
-        // Apply colors
-        const colors = [];
-        const positions = tubeGeometry.attributes.position;
-        
-        for (let i = 0; i < positions.count; i++) {
-          const z = positions.getZ(i);
-          const t = Math.abs(z) / (depth * 0.9);
-          
-          const colorIndex = t * (CONFIG.colors.spiral.length - 1);
-          const idx1 = Math.floor(colorIndex);
-          const idx2 = Math.min(idx1 + 1, CONFIG.colors.spiral.length - 1);
-          const blend = colorIndex - idx1;
-          
-          const c1 = new THREE.Color(CONFIG.colors.spiral[idx1]);
-          const c2 = new THREE.Color(CONFIG.colors.spiral[idx2]);
-          const color = c1.lerp(c2, blend);
-          
-          colors.push(color.r, color.g, color.b);
-        }
-        
-        tubeGeometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-        
-        const material = new THREE.MeshBasicMaterial({
-          vertexColors: true,
-          transparent: true,
-          opacity: 0.6 - s * 0.15,
-          side: THREE.DoubleSide
-        });
-        
-        const innerSpiral = new THREE.Mesh(tubeGeometry, material);
-        innerSpirals.push(innerSpiral);
-        spiralGroup.add(innerSpiral);
-      }
-    }
-
-    function createParticles() {
-      const particleCount = 350;  // More particles
-      const positions = [];
-      const colors = [];
-      const sizes = [];
-      
-      for (let i = 0; i < particleCount; i++) {
-        // Position along and around the spiral
-        const t = Math.random();
-        const angle = t * CONFIG.spiral.turns * Math.PI * 2;
-        const baseRadius = CONFIG.spiral.maxRadius * Math.pow(CONFIG.spiral.minRadius / CONFIG.spiral.maxRadius, t);
-        
-        // Offset from the spiral - tighter clustering
-        const offset = (Math.random() - 0.5) * 1.2;
-        const radius = baseRadius + offset;
-        
-        const x = Math.cos(angle) * radius;
-        const y = Math.sin(angle) * radius;
-        const z = -t * CONFIG.spiral.depth + (Math.random() - 0.5) * 0.4;
-        
-        positions.push(x, y, z);
-        
-        // Color
-        const color = new THREE.Color(CONFIG.colors.spiral[Math.floor(Math.random() * CONFIG.colors.spiral.length)]);
-        colors.push(color.r, color.g, color.b);
-        
-        // Size
-        sizes.push(Math.random() * 4 + 1);
+        sizes[i] = Math.random() * 2 + 0.5;
       }
       
       const geometry = new THREE.BufferGeometry();
-      geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-      geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-      geometry.setAttribute('size', new THREE.Float32BufferAttribute(sizes, 1));
+      geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+      geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
       
       const material = new THREE.PointsMaterial({
-        size: 0.06,
+        size: 0.03,
         vertexColors: true,
         transparent: true,
-        opacity: 0.7,
-        sizeAttenuation: true
+        opacity: 0.8,
+        sizeAttenuation: true,
+        map: createParticleTexture(64, 0.2),
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
       });
       
-      particles = new THREE.Points(geometry, material);
-      spiralGroup.add(particles);
+      starParticles = new THREE.Points(geometry, material);
+      scene.add(starParticles); // Add to scene, not galaxy group (doesn't rotate)
+    }
+
+    // Central core - dense, bright
+    function createGalaxyCore() {
+      const count = CONFIG.galaxy.particles.core;
+      const positions = new Float32Array(count * 3);
+      const colors = new Float32Array(count * 3);
+      const sizes = new Float32Array(count);
+      
+      const coreColor = new THREE.Color(CONFIG.colors.gold);
+      const innerColor = new THREE.Color('#FFFFFF');
+      
+      for (let i = 0; i < count; i++) {
+        // Gaussian distribution for core density
+        const r = Math.abs(gaussianRandom()) * CONFIG.galaxy.coreRadius * 3;
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.acos(2 * Math.random() - 1);
+        
+        // Flatten slightly for disk shape
+        const flattenFactor = 0.3;
+        
+        positions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+        positions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta) * flattenFactor;
+        positions[i * 3 + 2] = r * Math.cos(phi) * flattenFactor;
+        
+        // Color gradient from white center to gold edge
+        const t = Math.min(r / (CONFIG.galaxy.coreRadius * 2), 1);
+        const color = innerColor.clone().lerp(coreColor, t);
+        
+        colors[i * 3] = color.r;
+        colors[i * 3 + 1] = color.g;
+        colors[i * 3 + 2] = color.b;
+        
+        // Larger particles near center
+        sizes[i] = (1 - t * 0.5) * (Math.random() * 0.15 + 0.1);
+      }
+      
+      const geometry = new THREE.BufferGeometry();
+      geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+      geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+      
+      const material = new THREE.PointsMaterial({
+        size: 0.15,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.9,
+        sizeAttenuation: true,
+        map: createParticleTexture(128, 0.3),
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+      });
+      
+      coreParticles = new THREE.Points(geometry, material);
+      galaxyGroup.add(coreParticles);
+    }
+
+    // Spiral arms - the main feature
+    function createSpiralArms() {
+      const count = CONFIG.galaxy.particles.arms;
+      const positions = new Float32Array(count * 3);
+      const colors = new Float32Array(count * 3);
+      const sizes = new Float32Array(count);
+      
+      const { arms, turns, maxRadius, coreRadius, armWidth } = CONFIG.galaxy;
+      
+      // Color stops
+      const colorStops = CONFIG.colors.spiral.map(c => new THREE.Color(c));
+      
+      for (let i = 0; i < count; i++) {
+        // Which arm
+        const armIndex = i % arms;
+        const armOffset = (armIndex / arms) * Math.PI * 2;
+        
+        // Position along arm (bias toward outer regions for visual density)
+        const t = Math.pow(Math.random(), 0.7); // 0 = center, 1 = edge
+        const radius = coreRadius + t * (maxRadius - coreRadius);
+        
+        // Spiral angle
+        const spiralAngle = t * turns * Math.PI * 2 + armOffset;
+        
+        // Add spread perpendicular to arm
+        const spread = (Math.random() - 0.5) * armWidth * (1 - t * 0.3);
+        const spreadAngle = spiralAngle + Math.PI / 2;
+        
+        // Vertical spread (thinner disk)
+        const verticalSpread = (Math.random() - 0.5) * 0.4 * (1 - t * 0.5);
+        
+        const x = Math.cos(spiralAngle) * radius + Math.cos(spreadAngle) * spread;
+        const z = Math.sin(spiralAngle) * radius + Math.sin(spreadAngle) * spread;
+        const y = verticalSpread;
+        
+        positions[i * 3] = x;
+        positions[i * 3 + 1] = y;
+        positions[i * 3 + 2] = z;
+        
+        // Color based on distance from center
+        const colorT = t * (colorStops.length - 1);
+        const colorIdx = Math.floor(colorT);
+        const colorBlend = colorT - colorIdx;
+        const c1 = colorStops[Math.min(colorIdx, colorStops.length - 1)];
+        const c2 = colorStops[Math.min(colorIdx + 1, colorStops.length - 1)];
+        const color = c1.clone().lerp(c2, colorBlend);
+        
+        // Slight random variation
+        color.r = Math.min(1, color.r + (Math.random() - 0.5) * 0.1);
+        color.g = Math.min(1, color.g + (Math.random() - 0.5) * 0.1);
+        color.b = Math.min(1, color.b + (Math.random() - 0.5) * 0.1);
+        
+        colors[i * 3] = color.r;
+        colors[i * 3 + 1] = color.g;
+        colors[i * 3 + 2] = color.b;
+        
+        // Size varies with distance and randomness
+        sizes[i] = (0.8 - t * 0.4) * (Math.random() * 0.1 + 0.05);
+      }
+      
+      const geometry = new THREE.BufferGeometry();
+      geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+      geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+      
+      const material = new THREE.PointsMaterial({
+        size: 0.12,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.85,
+        sizeAttenuation: true,
+        map: createParticleTexture(128, 0.4),
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+      });
+      
+      armParticles = new THREE.Points(geometry, material);
+      galaxyGroup.add(armParticles);
+    }
+
+    // Dust layer - large, very soft, sparse
+    function createDustLayer() {
+      const count = CONFIG.galaxy.particles.dust;
+      const positions = new Float32Array(count * 3);
+      const colors = new Float32Array(count * 3);
+      
+      const dustColors = [
+        new THREE.Color(CONFIG.colors.gold).multiplyScalar(0.3),
+        new THREE.Color(CONFIG.colors.rust).multiplyScalar(0.4),
+        new THREE.Color(CONFIG.colors.wine).multiplyScalar(0.3)
+      ];
+      
+      for (let i = 0; i < count; i++) {
+        // Spread across the galaxy area
+        const r = Math.random() * CONFIG.galaxy.maxRadius * 1.2;
+        const theta = Math.random() * Math.PI * 2;
+        const y = (Math.random() - 0.5) * 1.5;
+        
+        positions[i * 3] = Math.cos(theta) * r;
+        positions[i * 3 + 1] = y;
+        positions[i * 3 + 2] = Math.sin(theta) * r;
+        
+        const color = dustColors[Math.floor(Math.random() * dustColors.length)];
+        colors[i * 3] = color.r;
+        colors[i * 3 + 1] = color.g;
+        colors[i * 3 + 2] = color.b;
+      }
+      
+      const geometry = new THREE.BufferGeometry();
+      geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+      
+      const material = new THREE.PointsMaterial({
+        size: 0.5,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.15,
+        sizeAttenuation: true,
+        map: createParticleTexture(256, 0.5),
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+      });
+      
+      dustParticles = new THREE.Points(geometry, material);
+      galaxyGroup.add(dustParticles);
+    }
+    
+    // Gaussian random for natural clustering
+    function gaussianRandom() {
+      let u = 0, v = 0;
+      while (u === 0) u = Math.random();
+      while (v === 0) v = Math.random();
+      return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
     }
 
     // ============================================
@@ -389,80 +465,58 @@
       frameSpiralGroup = new THREE.Group();
       frameScene.add(frameSpiralGroup);
       
-      // Create a smaller, flatter decorative spiral
-      createFrameSpiral();
-      
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
-      frameScene.add(ambientLight);
+      createFrameGalaxy();
     }
 
-    function createFrameSpiral() {
-      const turns = 6;
-      const segments = 600;
-      const maxRadius = 2;
-      const minRadius = 0.15;
-      const depth = 1.5;
-      const tubeRadius = 0.04;
+    function createFrameGalaxy() {
+      const count = 2000;
+      const positions = new Float32Array(count * 3);
+      const colors = new Float32Array(count * 3);
       
-      const points = [];
-      for (let i = 0; i <= segments; i++) {
-        const t = i / segments;
-        const angle = t * turns * Math.PI * 2;
-        const radius = maxRadius * Math.pow(minRadius / maxRadius, t);
+      const colorStops = CONFIG.colors.spiral.map(c => new THREE.Color(c));
+      
+      for (let i = 0; i < count; i++) {
+        const armIndex = i % 2;
+        const armOffset = (armIndex / 2) * Math.PI * 2;
         
-        const x = Math.cos(angle) * radius;
-        const y = Math.sin(angle) * radius;
-        const z = -t * depth;
+        const t = Math.pow(Math.random(), 0.6);
+        const radius = 0.2 + t * 2;
+        const spiralAngle = t * 3 * Math.PI * 2 + armOffset;
+        const spread = (Math.random() - 0.5) * 0.4;
+        const spreadAngle = spiralAngle + Math.PI / 2;
         
-        points.push(new THREE.Vector3(x, y, z));
+        positions[i * 3] = Math.cos(spiralAngle) * radius + Math.cos(spreadAngle) * spread;
+        positions[i * 3 + 1] = (Math.random() - 0.5) * 0.2;
+        positions[i * 3 + 2] = Math.sin(spiralAngle) * radius + Math.sin(spreadAngle) * spread;
+        
+        const colorT = t * (colorStops.length - 1);
+        const colorIdx = Math.floor(colorT);
+        const c1 = colorStops[Math.min(colorIdx, colorStops.length - 1)];
+        const c2 = colorStops[Math.min(colorIdx + 1, colorStops.length - 1)];
+        const color = c1.clone().lerp(c2, colorT - colorIdx);
+        
+        colors[i * 3] = color.r;
+        colors[i * 3 + 1] = color.g;
+        colors[i * 3 + 2] = color.b;
       }
       
-      const curve = new THREE.CatmullRomCurve3(points);
-      const tubeGeometry = new THREE.TubeGeometry(curve, segments, tubeRadius, 8, false);
+      const geometry = new THREE.BufferGeometry();
+      geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
       
-      const colors = [];
-      const positions = tubeGeometry.attributes.position;
-      
-      for (let i = 0; i < positions.count; i++) {
-        const z = positions.getZ(i);
-        const t = Math.abs(z) / depth;
-        
-        const colorIndex = t * (CONFIG.colors.spiral.length - 1);
-        const idx1 = Math.floor(colorIndex);
-        const idx2 = Math.min(idx1 + 1, CONFIG.colors.spiral.length - 1);
-        const blend = colorIndex - idx1;
-        
-        const c1 = new THREE.Color(CONFIG.colors.spiral[idx1]);
-        const c2 = new THREE.Color(CONFIG.colors.spiral[idx2]);
-        const color = c1.lerp(c2, blend);
-        
-        colors.push(color.r, color.g, color.b);
-      }
-      
-      tubeGeometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-      
-      const material = new THREE.MeshBasicMaterial({
+      const material = new THREE.PointsMaterial({
+        size: 0.08,
         vertexColors: true,
         transparent: true,
-        opacity: 0.5,
-        side: THREE.DoubleSide
+        opacity: 0.6,
+        sizeAttenuation: true,
+        map: createParticleTexture(64, 0.4),
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
       });
       
-      const frameMesh = new THREE.Mesh(tubeGeometry, material);
-      frameSpiralGroup.add(frameMesh);
-      
-      // Add glow lines
-      for (let i = 0; i < 2; i++) {
-        const lineGeometry = new THREE.BufferGeometry().setFromPoints(points);
-        const lineMaterial = new THREE.LineBasicMaterial({
-          color: new THREE.Color(CONFIG.colors.spiral[i]),
-          transparent: true,
-          opacity: 0.25 - i * 0.08
-        });
-        const line = new THREE.Line(lineGeometry, lineMaterial);
-        line.scale.set(1 + i * 0.05, 1 + i * 0.05, 1);
-        frameSpiralGroup.add(line);
-      }
+      const frameParticles = new THREE.Points(geometry, material);
+      frameSpiralGroup.add(frameParticles);
     }
 
     // ============================================
@@ -474,50 +528,43 @@
     }
 
     function updateScene() {
-      time += 0.01;
+      time += 0.008;
       
       // Smooth scroll interpolation
       scrollProgress += (targetScrollProgress - scrollProgress) * 0.08;
       
-      // Phase definitions - REVISED FOR DIEGETIC TRANSITION
-      const phase1End = 0.35;      // Spiral draws and grows
-      const phase2Start = 0.2;    // Name starts appearing
-      const phase2End = 0.45;      // Name fully visible
-      const phase3Start = 0.45;    // Fade transition begins
-      const phase3End = 0.70;      // Spiral faded, bio rises
-      const phase4Start = 0.65;    // Bio content appears
+      // Phase definitions
+      const phase1End = 0.35;
+      const phase2Start = 0.2;
+      const phase2End = 0.45;
+      const phase3Start = 0.45;
+      const phase3End = 0.70;
+      const phase4Start = 0.65;
       
-      // Phase 1: Draw and rotate spiral (0 - 0.35)
-      const drawProgress = Math.min(scrollProgress / phase1End, 1);
-      
-      if (spiralMesh) {
-        // Animate spiral rotation - continuous gentle spin
-        spiralGroup.rotation.z = drawProgress * Math.PI * 2 + time * 0.08;
+      // Galaxy rotation - slow, majestic
+      if (galaxyGroup) {
+        galaxyGroup.rotation.y = time * 0.15;
         
-        // Gentle wobble for life
-        spiralGroup.rotation.x = Math.sin(time * 0.5) * 0.03;
-        spiralGroup.rotation.y = Math.cos(time * 0.3) * 0.03;
+        // Tilt based on scroll
+        const tiltAmount = Math.min(scrollProgress / phase1End, 1) * 0.3;
+        galaxyGroup.rotation.x = -0.5 + tiltAmount;
         
-        // Scale based on scroll - starts bigger, feels more present
-        const scale = 0.4 + drawProgress * 0.6;
-        spiralGroup.scale.set(scale, scale, scale);
+        // Scale based on scroll
+        const baseScale = 0.6;
+        const scrollScale = Math.min(scrollProgress / phase1End, 1) * 0.5;
+        const scale = baseScale + scrollScale;
+        galaxyGroup.scale.set(scale, scale, scale);
         
-        // Move camera slightly into the vortex for pull effect
-        camera.position.z = 7 - drawProgress * 2;
+        // Camera moves closer
+        camera.position.z = 8 - Math.min(scrollProgress / phase1End, 1) * 2;
       }
       
-      // Inner spirals counter-rotate slightly
-      innerSpirals.forEach((spiral, i) => {
-        spiral.rotation.z = -time * 0.03 * (i + 1);
-      });
-      
-      // Particle animation
-      if (particles) {
-        particles.rotation.z = time * 0.04;
-        particles.material.opacity = 0.5 + Math.sin(time) * 0.2;
+      // Background stars subtle twinkle
+      if (starParticles) {
+        starParticles.rotation.y = time * 0.01;
       }
       
-      // Phase 2: Name reveal (0.2 - 0.45)
+      // Name reveal
       const nameReveal = document.getElementById('name-reveal');
       if (scrollProgress >= phase2Start && scrollProgress <= phase2End) {
         const nameProgress = (scrollProgress - phase2Start) / (phase2End - phase2Start);
@@ -532,43 +579,34 @@
         nameReveal.style.transform = 'translate(-50%, -50%) translateY(0)';
       }
       
-      // Phase 3: DIEGETIC TRANSITION - Spiral fades in place (0.45 - 0.70)
+      // Phase 3: Galaxy fades
       if (scrollProgress >= phase3Start) {
         const transitionProgress = Math.min((scrollProgress - phase3Start) / (phase3End - phase3Start), 1);
         const eased = easeOutCubic(transitionProgress);
         
-        // Spiral fades in place - NO MOVEMENT
-        spiralMesh.material.opacity = 1 - eased * 0.85;
+        // Fade all galaxy particles
+        if (armParticles) armParticles.material.opacity = 0.85 * (1 - eased * 0.9);
+        if (coreParticles) coreParticles.material.opacity = 0.9 * (1 - eased * 0.9);
+        if (dustParticles) dustParticles.material.opacity = 0.15 * (1 - eased * 0.9);
         
-        // Inner spirals fade too
-        innerSpirals.forEach((spiral, i) => {
-          spiral.material.opacity = (0.6 - i * 0.15) * (1 - eased);
-        });
-        
-        // Particles fade
-        if (particles) {
-          particles.material.opacity = (0.5 + Math.sin(time) * 0.2) * (1 - eased * 0.9);
-        }
-        
-        // Name fades out
+        // Name fades
         if (transitionProgress > 0.2) {
           const nameFade = (transitionProgress - 0.2) / 0.6;
           nameReveal.style.opacity = 1 - easeOutCubic(nameFade);
         }
         
-        // Spiral slightly shrinks and drifts back
-        const shrinkScale = 1 - eased * 0.3;
-        spiralGroup.scale.set(shrinkScale, shrinkScale, shrinkScale);
-        camera.position.z = 5 + eased * 2;
+        // Galaxy shrinks back
+        const shrinkScale = (0.6 + 0.5) * (1 - eased * 0.4);
+        galaxyGroup.scale.set(shrinkScale, shrinkScale, shrinkScale);
+        camera.position.z = 6 + eased * 3;
         
       } else {
-        spiralMesh.material.opacity = 1;
-        innerSpirals.forEach((spiral, i) => {
-          spiral.material.opacity = 0.6 - i * 0.15;
-        });
+        if (armParticles) armParticles.material.opacity = 0.85;
+        if (coreParticles) coreParticles.material.opacity = 0.9;
+        if (dustParticles) dustParticles.material.opacity = 0.15;
       }
       
-      // Phase 4: Bio content rises up (0.65 - 1)
+      // Phase 4: Bio content
       const bioContent = document.getElementById('bio-content');
       const photoFrame = document.getElementById('photo-frame');
       const spiralFrameContainer = document.getElementById('spiral-frame-container');
@@ -577,15 +615,12 @@
         const bioProgress = Math.min((scrollProgress - phase4Start) / 0.25, 1);
         const eased = easeOutCubic(bioProgress);
         
-        // Bio content rises up with fade
         bioContent.style.opacity = eased;
         bioContent.style.transform = `translateY(${(1 - eased) * 80}px)`;
         
-        // Photo rises up
         photoFrame.style.opacity = eased;
         photoFrame.style.transform = `translateY(${(1 - eased) * 60}px) scale(${0.95 + eased * 0.05})`;
         
-        // Decorative spiral frame appears behind photo
         spiralFrameContainer.style.opacity = eased * 0.7;
         
       } else {
@@ -596,13 +631,12 @@
         spiralFrameContainer.style.opacity = 0;
       }
       
-      // Animate frame spiral
+      // Frame spiral rotation
       if (frameSpiralGroup) {
-        frameSpiralGroup.rotation.z = time * 0.05;
+        frameSpiralGroup.rotation.y = time * 0.1;
       }
     }
     
-    // Easing function
     function easeOutCubic(t) {
       return 1 - Math.pow(1 - t, 3);
     }
@@ -615,7 +649,6 @@
       updateScene();
       renderer.render(scene, camera);
       
-      // Render frame spiral
       if (frameRenderer && frameScene && frameCamera) {
         frameRenderer.render(frameScene, frameCamera);
       }

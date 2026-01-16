@@ -1,28 +1,23 @@
 /* ============================================
    GABRIELLE EMEM HARRY
    Cultural Strategist & Writer
-   3D Galaxy Spiral Portfolio
+   Minimal Two-Color Portfolio
    ============================================ */
 
-/* Fonts - Clash Display (headers) + Space Grotesk (body) */
+/* Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 @import url('https://api.fontshare.com/v2/css?f[]=clash-display@200,300,400,500,600,700&display=swap');
 
 /* ============================================
-   CSS VARIABLES
+   CSS VARIABLES - TWO COLORS ONLY
    ============================================ */
 :root {
-  /* Dark theme colors */
-  --bg-dark: #27213C;
-  --bg-dark-lighter: #342D4A;
-  --text-light: #FFFFFF;
-  --text-muted: rgba(255, 255, 255, 0.7);
+  /* Gabrielle's chosen palette */
+  --sand: #9B461F;        /* Background */
+  --plum: #6A1D2F;        /* Text */
   
-  /* Accent colors - warm to deep */
-  --gold: #DEA450;
-  --rust: #9B461F;
-  --wine: #6A1D2F;
-  --forest: #354C3C;
+  /* Muted variant for secondary text */
+  --plum-muted: rgba(106, 29, 47, 0.7);
   
   /* Typography */
   --font-display: 'Clash Display', 'Helvetica Neue', sans-serif;
@@ -48,15 +43,15 @@ html {
 
 body {
   font-family: var(--font-body);
-  background: var(--bg-dark);
-  color: var(--text-light);
+  background: var(--sand);
+  color: var(--plum);
   line-height: 1.6;
   overflow-x: hidden;
 }
 
 ::selection {
-  background: var(--gold);
-  color: var(--bg-dark);
+  background: var(--plum);
+  color: var(--sand);
 }
 
 a {
@@ -70,7 +65,7 @@ img {
 }
 
 /* ============================================
-   THREE.JS CANVAS
+   CANVAS CONTAINER
    ============================================ */
 #spiral-container {
   position: fixed;
@@ -96,22 +91,9 @@ img {
   right: 0;
   z-index: 100;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
   padding: 2rem 3rem;
-}
-
-.nav-logo {
-  font-family: var(--font-display);
-  font-size: 1.1rem;
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  color: var(--text-light);
-  transition: opacity 0.3s ease;
-}
-
-.nav-logo:hover {
-  opacity: 0.7;
 }
 
 .nav-link {
@@ -120,7 +102,7 @@ img {
   font-weight: 500;
   letter-spacing: 0.08em;
   text-transform: lowercase;
-  color: var(--text-light);
+  color: var(--plum);
   position: relative;
   padding-bottom: 2px;
 }
@@ -132,7 +114,7 @@ img {
   left: 0;
   width: 0;
   height: 1px;
-  background: var(--text-light);
+  background: var(--plum);
   transition: width 0.4s var(--ease-out-expo);
 }
 
@@ -179,11 +161,11 @@ img {
 
 .name {
   font-family: var(--font-display);
-  font-weight: 700;
-  font-size: clamp(2.2rem, 7vw, 6rem);
+  font-weight: 500;  /* Lighter weight per Gabrielle's feedback */
+  font-size: clamp(2.2rem, 7vw, 5.5rem);
   line-height: 1;
   letter-spacing: -0.02em;
-  color: var(--text-light);
+  color: var(--plum);
   text-transform: lowercase;
   white-space: nowrap;
 }
@@ -215,19 +197,6 @@ img {
   position: relative;
 }
 
-/* Decorative spiral frame - will be positioned via JS */
-.spiral-frame-container {
-  position: absolute;
-  top: -100px;
-  left: -150px;
-  width: 450px;
-  height: 450px;
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0;
-  transition: opacity 1s ease;
-}
-
 .photo-wrapper {
   position: relative;
   z-index: 1;
@@ -239,45 +208,23 @@ img {
   transition: opacity 0.8s ease, transform 0.8s var(--ease-out-expo);
 }
 
-.photo-frame::before {
-  content: '';
-  position: absolute;
-  top: -20px;
-  left: -20px;
-  right: 20px;
-  bottom: 20px;
-  border: 2px solid var(--gold);
-  opacity: 0.4;
-  pointer-events: none;
-}
-
-.photo-frame::after {
-  content: '';
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  right: -20px;
-  bottom: -20px;
-  border: 2px solid var(--rust);
-  opacity: 0.3;
-  pointer-events: none;
-}
+/* NO BORDERS - clean and simple per Gabrielle's request */
 
 .photo {
   width: 100%;
   max-width: 500px;
   aspect-ratio: 3/4;
   object-fit: cover;
-  filter: grayscale(20%) contrast(1.05);
 }
 
 .photo-caption {
   font-family: var(--font-display);
   font-size: 0.9rem;
   font-weight: 500;
-  color: var(--gold);
+  color: var(--plum);
   margin-top: 1.25rem;
   letter-spacing: 0.02em;
+  opacity: 0.8;
 }
 
 .bio-content {
@@ -307,7 +254,7 @@ img {
   font-family: var(--font-body);
   font-size: 1rem;
   line-height: 1.8;
-  color: var(--text-muted);
+  color: var(--plum-muted);
   font-weight: 400;
 }
 
@@ -315,18 +262,18 @@ img {
   font-family: var(--font-display);
   font-size: 1.2rem;
   font-weight: 500;
-  color: var(--text-light);
+  color: var(--plum);
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
   padding-top: 2rem;
-  border-top: 1px solid var(--rust);
+  border-top: 1px solid var(--plum-muted);
   margin-top: 1rem;
-  transition: color 0.3s ease;
+  transition: opacity 0.3s ease;
 }
 
 .contact-link:hover {
-  color: var(--gold);
+  opacity: 0.7;
 }
 
 .contact-link::after {
@@ -345,7 +292,7 @@ img {
   position: relative;
   z-index: 10;
   padding: 4rem;
-  background: #1a1628;
+  background: var(--plum);
   text-align: center;
 }
 
@@ -356,17 +303,18 @@ img {
 }
 
 .footer-inner a {
-  color: var(--text-muted);
-  transition: color 0.3s ease;
+  color: var(--sand);
+  opacity: 0.8;
+  transition: opacity 0.3s ease;
 }
 
 .footer-inner a:hover {
-  color: var(--gold);
+  opacity: 1;
 }
 
 .footer-sep {
   margin: 0 1.5rem;
-  color: var(--rust);
+  color: var(--sand);
   opacity: 0.4;
 }
 
@@ -388,14 +336,6 @@ img {
   .bio-content {
     padding: 0 1rem;
   }
-  
-  .spiral-frame-container {
-    top: -80px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 350px;
-    height: 350px;
-  }
 }
 
 @media (max-width: 768px) {
@@ -413,10 +353,6 @@ img {
     margin-top: 20vh;
   }
   
-  .bio-label {
-    font-size: 0.85rem;
-  }
-  
   .bio-text {
     font-size: 0.95rem;
   }
@@ -428,18 +364,9 @@ img {
   .footer {
     padding: 3rem 2rem;
   }
-  
-  .spiral-frame-container {
-    display: none;
-  }
 }
 
 @media (max-width: 480px) {
-  .photo-frame::before,
-  .photo-frame::after {
-    display: none;
-  }
-  
   .bio-block {
     text-align: left;
   }
@@ -450,27 +377,27 @@ img {
    ============================================ */
 .page-works {
   min-height: 100vh;
-  background: var(--bg-dark);
+  background: var(--sand);
   padding-top: 120px;
 }
 
 .works-header {
   padding: 4rem 6rem;
-  background: #1a1628;
+  background: var(--plum);
   margin-bottom: 4rem;
 }
 
 .works-title {
   font-family: var(--font-display);
   font-size: clamp(2.5rem, 6vw, 4rem);
-  font-weight: 600;
-  color: var(--text-light);
+  font-weight: 500;
+  color: var(--sand);
   letter-spacing: -0.01em;
 }
 
 .works-title span {
   font-weight: 400;
-  color: var(--gold);
+  opacity: 0.8;
 }
 
 .works-nav {
@@ -480,37 +407,29 @@ img {
   right: 0;
   z-index: 100;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
   padding: 2rem 3rem;
-  background: var(--bg-dark);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.works-nav .nav-logo {
-  color: var(--text-light);
+  background: var(--sand);
+  border-bottom: 1px solid var(--plum-muted);
 }
 
 .works-nav .nav-link {
-  color: var(--text-light);
+  color: var(--plum);
 }
 
 .works-nav .nav-link::after {
-  background: var(--text-light);
+  background: var(--plum);
 }
 
 /* Works Sections */
 .works-section {
   padding: 4rem 6rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid var(--plum-muted);
 }
 
 .works-section:last-child {
   border-bottom: none;
-}
-
-.works-section:nth-child(even) {
-  background: rgba(52, 45, 74, 0.3);
 }
 
 .works-section-inner {
@@ -526,9 +445,9 @@ img {
   font-weight: 600;
   letter-spacing: 0.15em;
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: var(--plum-muted);
   padding-top: 0.5rem;
-  border-top: 2px solid var(--gold);
+  border-top: 2px solid var(--plum);
 }
 
 /* Books */
@@ -545,19 +464,19 @@ img {
 .book-link {
   font-family: var(--font-display);
   font-size: 1.4rem;
-  font-weight: 600;
-  color: var(--text-light);
-  transition: color 0.3s ease;
+  font-weight: 500;
+  color: var(--plum);
+  transition: opacity 0.3s ease;
   display: inline-block;
 }
 
 .book-link:hover {
-  color: var(--gold);
+  opacity: 0.7;
 }
 
 .book-note {
   font-family: var(--font-body);
-  color: var(--text-muted);
+  color: var(--plum-muted);
   font-size: 0.9rem;
   margin-top: 0.25rem;
 }
@@ -570,13 +489,13 @@ img {
 
 .book-covers img {
   width: 140px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 8px 30px rgba(106, 29, 47, 0.2);
   transition: transform 0.4s var(--ease-out-expo), box-shadow 0.4s ease;
 }
 
 .book-covers img:hover {
   transform: translateY(-8px);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 16px 40px rgba(106, 29, 47, 0.3);
 }
 
 /* Publications */
@@ -588,7 +507,7 @@ img {
 
 .publication-item {
   padding-bottom: 1.5rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(106, 29, 47, 0.15);
 }
 
 .publication-item:last-child {
@@ -597,14 +516,14 @@ img {
 
 .publication-item .title {
   font-family: var(--font-display);
-  font-weight: 600;
+  font-weight: 500;
   font-size: 1.1rem;
-  color: var(--text-light);
+  color: var(--plum);
 }
 
 .publication-item .venue {
   font-family: var(--font-body);
-  color: var(--text-muted);
+  color: var(--plum-muted);
   font-size: 0.9rem;
   margin-top: 0.25rem;
 }
@@ -612,7 +531,8 @@ img {
 .publication-item .note {
   font-family: var(--font-body);
   font-size: 0.85rem;
-  color: var(--gold);
+  color: var(--plum);
+  opacity: 0.8;
   margin-top: 0.25rem;
 }
 
@@ -623,7 +543,7 @@ img {
   font-weight: 600;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--rust);
+  color: var(--plum-muted);
   margin: 3rem 0 1.5rem;
 }
 
@@ -650,12 +570,11 @@ img {
   width: 100%;
   aspect-ratio: 4/3;
   object-fit: cover;
-  filter: grayscale(30%);
-  transition: filter 0.4s ease;
+  transition: opacity 0.4s ease;
 }
 
 .art-item:hover img {
-  filter: grayscale(0%);
+  opacity: 0.9;
 }
 
 .art-title {
@@ -663,13 +582,13 @@ img {
   font-size: 0.95rem;
   font-weight: 500;
   margin-top: 0.75rem;
-  color: var(--text-light);
+  color: var(--plum);
 }
 
 /* Works Page Footer */
 .works-footer {
   padding: 5rem 6rem;
-  background: #1a1628;
+  background: var(--plum);
   text-align: center;
 }
 

@@ -10,14 +10,16 @@
 <body>
   <!-- Navigation -->
   <header class="nav">
-    <a href="index.html" class="nav-logo">asari.web</a>
+    <a href="index.html" class="nav-logo">gabrielle emem harry</a>
     <nav>
       <a href="works.html" class="nav-link">works</a>
     </nav>
   </header>
 
-  <!-- Three.js Canvas Container -->
-  <div id="spiral-container"></div>
+  <!-- Spiral Canvas Container -->
+  <div id="spiral-container">
+    <canvas id="spiral-canvas"></canvas>
+  </div>
 
   <!-- Scroll Container -->
   <div class="scroll-container">
@@ -34,11 +36,6 @@
     <!-- Section 2: Photo + Bio -->
     <section class="section section-bio" id="section-bio">
       <div class="bio-container">
-        <!-- Decorative spiral frame canvas -->
-        <div class="spiral-frame-container" id="spiral-frame-container">
-          <canvas id="spiral-frame-canvas"></canvas>
-        </div>
-        
         <div class="photo-wrapper">
           <div class="photo-frame" id="photo-frame">
             <img src="images/gabrielle.jpg" alt="Gabrielle Emem Harry" class="photo">
@@ -56,8 +53,8 @@
             </p>
           </div>
 
-          <a href="mailto:gabbyharry.gh@gmail.com" class="contact-link">
-            gabbyharry.gh@gmail.com
+          <a href="mailto:gabrielleememharry@gmail.com" class="contact-link">
+            gabrielleememharry@gmail.com
           </a>
         </div>
       </div>
@@ -68,484 +65,103 @@
   <!-- Footer -->
   <footer class="footer">
     <div class="footer-inner">
-      <a href="mailto:gabbyharry.gh@gmail.com">email</a>
+      <a href="mailto:gabrielleememharry@gmail.com">email</a>
       <span class="footer-sep">·</span>
       <a href="works.html">works</a>
     </div>
   </footer>
 
-  <!-- Three.js -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  
   <script>
     // ============================================
-    // CONFIGURATION - GALAXY SPIRAL
+    // CONFIGURATION - 2D SPIRAL
     // ============================================
     const CONFIG = {
       colors: {
-        // New palette
-        gold: '#DEA450',
-        rust: '#9B461F',
-        wine: '#6A1D2F',
-        forest: '#354C3C',
-        // Gradient for spiral arms (outer to inner)
-        spiral: ['#DEA450', '#9B461F', '#6A1D2F', '#354C3C', '#27213C'],
-        background: '#27213C'
+        background: '#9B461F',  // Sand/rust
+        spiral: '#6A1D2F'       // Persian plum
       },
-      galaxy: {
-        arms: 2,              // Number of spiral arms
-        turns: 4,             // How tightly wound
-        maxRadius: 6,         // Outer edge (increased)
-        coreRadius: 0.25,     // Dense core size (slightly smaller)
-        armWidth: 1.0,        // How thick the arms are (wider)
-        particles: {
-          arms: 10000,        // Particles in spiral arms (more)
-          core: 1500,         // Particles in central core (fewer, less congested)
-          dust: 2500,         // Ambient dust particles (more)
-          stars: 1200         // Background stars (more)
-        }
+      spiral: {
+        turns: 8,              // Number of rotations
+        lineWidth: 2.5,        // Stroke thickness
+        spacing: 18,           // Space between lines
+        maxRadius: 0           // Calculated based on screen
       }
     };
 
     // ============================================
-    // THREE.JS SETUP
+    // CANVAS SETUP
     // ============================================
-    let scene, camera, renderer;
-    let galaxyGroup;
-    let armParticles, coreParticles, dustParticles, starParticles;
+    const canvas = document.getElementById('spiral-canvas');
+    const ctx = canvas.getContext('2d');
+    
     let scrollProgress = 0;
     let targetScrollProgress = 0;
     let time = 0;
-    
-    // For decorative frame spiral
-    let frameScene, frameCamera, frameRenderer;
-    let frameSpiralGroup;
-    
-    const container = document.getElementById('spiral-container');
-    
-    // Create soft circular texture for particles
-    function createParticleTexture(size, softness) {
-      const canvas = document.createElement('canvas');
-      canvas.width = size;
-      canvas.height = size;
-      const ctx = canvas.getContext('2d');
-      
-      const center = size / 2;
-      const gradient = ctx.createRadialGradient(center, center, 0, center, center, center);
-      
-      gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
-      gradient.addColorStop(softness, 'rgba(255, 255, 255, 0.5)');
-      gradient.addColorStop(0.7, 'rgba(255, 255, 255, 0.1)');
-      gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
-      
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, size, size);
-      
-      const texture = new THREE.CanvasTexture(canvas);
-      texture.needsUpdate = true;
-      return texture;
-    }
+    let centerX, centerY;
     
     function init() {
-      // Scene
-      scene = new THREE.Scene();
-      scene.background = new THREE.Color(CONFIG.colors.background);
-      
-      // Camera - start above and back, looking down at galaxy
-      camera = new THREE.PerspectiveCamera(
-        60,
-        window.innerWidth / window.innerHeight,
-        0.1,
-        1000
-      );
-      camera.position.z = 14;
-      camera.position.y = 5;
-      camera.position.x = 0;
-      camera.lookAt(0, -0.5, 0); // Look down at galaxy center
-      
-      // Renderer
-      renderer = new THREE.WebGLRenderer({ 
-        antialias: true,
-        alpha: true 
-      });
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-      container.appendChild(renderer.domElement);
-      
-      // Create galaxy group
-      galaxyGroup = new THREE.Group();
-      scene.add(galaxyGroup);
-      
-      // Create galaxy layers
-      createBackgroundStars();
-      createGalaxyCore();
-      createSpiralArms();
-      createDustLayer();
-      
-      // Initialize frame spiral (for bio section)
-      initFrameSpiral();
-      
-      // Events
-      window.addEventListener('resize', onResize);
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
       window.addEventListener('scroll', onScroll);
-      
-      // Initial scroll check
       onScroll();
-      
-      // Animate
       animate();
     }
-
-    // Background stars - spread across screen, denser near galaxy
-    function createBackgroundStars() {
-      const count = CONFIG.galaxy.particles.stars;
-      const positions = new Float32Array(count * 3);
-      const colors = new Float32Array(count * 3);
-      const sizes = new Float32Array(count);
-      
-      for (let i = 0; i < count; i++) {
-        // Mix of close stars (around galaxy) and distant stars (screen edges)
-        const isClose = Math.random() < 0.6; // 60% close to galaxy
-        
-        let x, y, z;
-        
-        if (isClose) {
-          // Stars clustered around the galaxy plane, denser near center
-          const r = 4 + Math.pow(Math.random(), 0.5) * 12; // 4-16 units, biased closer
-          const theta = Math.random() * Math.PI * 2;
-          const verticalSpread = (Math.random() - 0.5) * 4;
-          
-          x = Math.cos(theta) * r;
-          y = verticalSpread;
-          z = Math.sin(theta) * r - 2;
-        } else {
-          // Distant stars spread across entire view sphere
-          const theta = Math.random() * Math.PI * 2;
-          const phi = Math.acos(2 * Math.random() - 1);
-          const r = 20 + Math.random() * 30;
-          
-          x = r * Math.sin(phi) * Math.cos(theta);
-          y = r * Math.sin(phi) * Math.sin(theta);
-          z = r * Math.cos(phi) - 15;
-        }
-        
-        positions[i * 3] = x;
-        positions[i * 3 + 1] = y;
-        positions[i * 3 + 2] = z;
-        
-        // Mostly white/pale stars with occasional warm tints
-        const warmth = Math.random();
-        if (warmth > 0.85) {
-          colors[i * 3] = 1;
-          colors[i * 3 + 1] = 0.85;
-          colors[i * 3 + 2] = 0.7;
-        } else {
-          colors[i * 3] = 0.85 + Math.random() * 0.15;
-          colors[i * 3 + 1] = 0.85 + Math.random() * 0.15;
-          colors[i * 3 + 2] = 0.95 + Math.random() * 0.05;
-        }
-        
-        sizes[i] = Math.random() * 2.5 + 0.5;
-      }
-      
-      const geometry = new THREE.BufferGeometry();
-      geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-      geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-      geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
-      
-      const material = new THREE.PointsMaterial({
-        size: 0.04,
-        vertexColors: true,
-        transparent: true,
-        opacity: 0.9,
-        sizeAttenuation: true,
-        map: createParticleTexture(64, 0.2),
-        blending: THREE.AdditiveBlending,
-        depthWrite: false
-      });
-      
-      starParticles = new THREE.Points(geometry, material);
-      scene.add(starParticles);
-    }
-
-    // Central core - less dense, dimmer gold (not white-hot)
-    function createGalaxyCore() {
-      const count = CONFIG.galaxy.particles.core;
-      const positions = new Float32Array(count * 3);
-      const colors = new Float32Array(count * 3);
-      const sizes = new Float32Array(count);
-      
-      // Dimmer core colors - no white, start from a muted gold
-      const coreColor = new THREE.Color(CONFIG.colors.gold).multiplyScalar(0.7);
-      const innerColor = new THREE.Color(CONFIG.colors.gold); // Gold center, not white
-      
-      for (let i = 0; i < count; i++) {
-        // Gaussian distribution for core density - spread out more
-        const r = Math.abs(gaussianRandom()) * CONFIG.galaxy.coreRadius * 4;
-        const theta = Math.random() * Math.PI * 2;
-        const phi = Math.acos(2 * Math.random() - 1);
-        
-        // Flatten for disk shape
-        const flattenFactor = 0.25;
-        
-        positions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
-        positions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta) * flattenFactor;
-        positions[i * 3 + 2] = r * Math.cos(phi) * flattenFactor;
-        
-        // Color gradient from gold center to darker gold edge
-        const t = Math.min(r / (CONFIG.galaxy.coreRadius * 3), 1);
-        const color = innerColor.clone().lerp(coreColor, t);
-        
-        colors[i * 3] = color.r;
-        colors[i * 3 + 1] = color.g;
-        colors[i * 3 + 2] = color.b;
-        
-        // Smaller particles overall
-        sizes[i] = (1 - t * 0.5) * (Math.random() * 0.1 + 0.06);
-      }
-      
-      const geometry = new THREE.BufferGeometry();
-      geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-      geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-      geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
-      
-      const material = new THREE.PointsMaterial({
-        size: 0.12,
-        vertexColors: true,
-        transparent: true,
-        opacity: 0.75, // Dimmer
-        sizeAttenuation: true,
-        map: createParticleTexture(128, 0.35),
-        blending: THREE.AdditiveBlending,
-        depthWrite: false
-      });
-      
-      coreParticles = new THREE.Points(geometry, material);
-      galaxyGroup.add(coreParticles);
-    }
-
-    // Spiral arms - the main feature
-    function createSpiralArms() {
-      const count = CONFIG.galaxy.particles.arms;
-      const positions = new Float32Array(count * 3);
-      const colors = new Float32Array(count * 3);
-      const sizes = new Float32Array(count);
-      
-      const { arms, turns, maxRadius, coreRadius, armWidth } = CONFIG.galaxy;
-      
-      // Color stops
-      const colorStops = CONFIG.colors.spiral.map(c => new THREE.Color(c));
-      
-      for (let i = 0; i < count; i++) {
-        // Which arm
-        const armIndex = i % arms;
-        const armOffset = (armIndex / arms) * Math.PI * 2;
-        
-        // Position along arm (bias toward outer regions for visual density)
-        const t = Math.pow(Math.random(), 0.7); // 0 = center, 1 = edge
-        const radius = coreRadius + t * (maxRadius - coreRadius);
-        
-        // Spiral angle
-        const spiralAngle = t * turns * Math.PI * 2 + armOffset;
-        
-        // Add spread perpendicular to arm
-        const spread = (Math.random() - 0.5) * armWidth * (1 - t * 0.3);
-        const spreadAngle = spiralAngle + Math.PI / 2;
-        
-        // Vertical spread (thinner disk)
-        const verticalSpread = (Math.random() - 0.5) * 0.4 * (1 - t * 0.5);
-        
-        const x = Math.cos(spiralAngle) * radius + Math.cos(spreadAngle) * spread;
-        const z = Math.sin(spiralAngle) * radius + Math.sin(spreadAngle) * spread;
-        const y = verticalSpread;
-        
-        positions[i * 3] = x;
-        positions[i * 3 + 1] = y;
-        positions[i * 3 + 2] = z;
-        
-        // Color based on distance from center
-        const colorT = t * (colorStops.length - 1);
-        const colorIdx = Math.floor(colorT);
-        const colorBlend = colorT - colorIdx;
-        const c1 = colorStops[Math.min(colorIdx, colorStops.length - 1)];
-        const c2 = colorStops[Math.min(colorIdx + 1, colorStops.length - 1)];
-        const color = c1.clone().lerp(c2, colorBlend);
-        
-        // Slight random variation
-        color.r = Math.min(1, color.r + (Math.random() - 0.5) * 0.1);
-        color.g = Math.min(1, color.g + (Math.random() - 0.5) * 0.1);
-        color.b = Math.min(1, color.b + (Math.random() - 0.5) * 0.1);
-        
-        colors[i * 3] = color.r;
-        colors[i * 3 + 1] = color.g;
-        colors[i * 3 + 2] = color.b;
-        
-        // Size varies with distance and randomness
-        sizes[i] = (0.8 - t * 0.4) * (Math.random() * 0.1 + 0.05);
-      }
-      
-      const geometry = new THREE.BufferGeometry();
-      geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-      geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-      geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
-      
-      const material = new THREE.PointsMaterial({
-        size: 0.12,
-        vertexColors: true,
-        transparent: true,
-        opacity: 0.85,
-        sizeAttenuation: true,
-        map: createParticleTexture(128, 0.4),
-        blending: THREE.AdditiveBlending,
-        depthWrite: false
-      });
-      
-      armParticles = new THREE.Points(geometry, material);
-      galaxyGroup.add(armParticles);
-    }
-
-    // Dust layer - thicker near galaxy, dissipates outward
-    function createDustLayer() {
-      const count = CONFIG.galaxy.particles.dust;
-      const positions = new Float32Array(count * 3);
-      const colors = new Float32Array(count * 3);
-      const sizes = new Float32Array(count);
-      
-      const dustColors = [
-        new THREE.Color(CONFIG.colors.gold).multiplyScalar(0.25),
-        new THREE.Color(CONFIG.colors.rust).multiplyScalar(0.35),
-        new THREE.Color(CONFIG.colors.wine).multiplyScalar(0.25)
-      ];
-      
-      for (let i = 0; i < count; i++) {
-        // Bias distribution toward center - more dust near galaxy
-        const t = Math.pow(Math.random(), 0.6); // Biased toward 0 (center)
-        const r = t * CONFIG.galaxy.maxRadius * 2.5;
-        const theta = Math.random() * Math.PI * 2;
-        
-        // Vertical spread increases with distance
-        const verticalSpread = (Math.random() - 0.5) * (0.5 + t * 2);
-        
-        positions[i * 3] = Math.cos(theta) * r;
-        positions[i * 3 + 1] = verticalSpread;
-        positions[i * 3 + 2] = Math.sin(theta) * r;
-        
-        const color = dustColors[Math.floor(Math.random() * dustColors.length)];
-        colors[i * 3] = color.r;
-        colors[i * 3 + 1] = color.g;
-        colors[i * 3 + 2] = color.b;
-        
-        // Larger particles near center, smaller at edges
-        sizes[i] = (1 - t * 0.6) * (Math.random() * 0.4 + 0.3);
-      }
-      
-      const geometry = new THREE.BufferGeometry();
-      geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-      geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-      geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
-      
-      const material = new THREE.PointsMaterial({
-        size: 0.6,
-        vertexColors: true,
-        transparent: true,
-        opacity: 0.18,
-        sizeAttenuation: true,
-        map: createParticleTexture(256, 0.5),
-        blending: THREE.AdditiveBlending,
-        depthWrite: false
-      });
-      
-      dustParticles = new THREE.Points(geometry, material);
-      galaxyGroup.add(dustParticles);
+    
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      centerX = canvas.width / 2;
+      centerY = canvas.height / 2;
+      CONFIG.spiral.maxRadius = Math.sqrt(centerX * centerX + centerY * centerY) + 100;
     }
     
-    // Gaussian random for natural clustering
-    function gaussianRandom() {
-      let u = 0, v = 0;
-      while (u === 0) u = Math.random();
-      while (v === 0) v = Math.random();
-      return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
-    }
-
     // ============================================
-    // DECORATIVE FRAME SPIRAL (for bio section)
+    // DRAW 2D ARCHIMEDEAN SPIRAL
     // ============================================
-    function initFrameSpiral() {
-      const frameContainer = document.getElementById('spiral-frame-container');
-      const frameCanvas = document.getElementById('spiral-frame-canvas');
+    function drawSpiral(rotation, scale, opacity) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
       
-      frameScene = new THREE.Scene();
-      frameScene.background = null;
+      if (opacity <= 0) return;
       
-      frameCamera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
-      frameCamera.position.z = 5;
+      ctx.save();
+      ctx.translate(centerX, centerY);
+      ctx.rotate(rotation);
+      ctx.scale(scale, scale);
       
-      frameRenderer = new THREE.WebGLRenderer({
-        canvas: frameCanvas,
-        antialias: true,
-        alpha: true
-      });
-      frameRenderer.setSize(450, 450);
-      frameRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-      frameRenderer.setClearColor(0x000000, 0);
+      ctx.strokeStyle = CONFIG.colors.spiral;
+      ctx.lineWidth = CONFIG.spiral.lineWidth;
+      ctx.lineCap = 'round';
+      ctx.globalAlpha = opacity;
       
-      frameSpiralGroup = new THREE.Group();
-      frameScene.add(frameSpiralGroup);
+      ctx.beginPath();
       
-      createFrameGalaxy();
-    }
-
-    function createFrameGalaxy() {
-      const count = 2000;
-      const positions = new Float32Array(count * 3);
-      const colors = new Float32Array(count * 3);
+      const { turns, spacing, maxRadius } = CONFIG.spiral;
+      const a = 0;
+      const b = spacing / (2 * Math.PI);
       
-      const colorStops = CONFIG.colors.spiral.map(c => new THREE.Color(c));
+      const maxTheta = turns * 2 * Math.PI;
+      const steps = turns * 200;
       
-      for (let i = 0; i < count; i++) {
-        const armIndex = i % 2;
-        const armOffset = (armIndex / 2) * Math.PI * 2;
+      for (let i = 0; i <= steps; i++) {
+        const theta = (i / steps) * maxTheta;
+        const r = a + b * theta;
         
-        const t = Math.pow(Math.random(), 0.6);
-        const radius = 0.2 + t * 2;
-        const spiralAngle = t * 3 * Math.PI * 2 + armOffset;
-        const spread = (Math.random() - 0.5) * 0.4;
-        const spreadAngle = spiralAngle + Math.PI / 2;
+        if (r > maxRadius / scale) break;
         
-        positions[i * 3] = Math.cos(spiralAngle) * radius + Math.cos(spreadAngle) * spread;
-        positions[i * 3 + 1] = (Math.random() - 0.5) * 0.2;
-        positions[i * 3 + 2] = Math.sin(spiralAngle) * radius + Math.sin(spreadAngle) * spread;
+        const x = r * Math.cos(theta);
+        const y = r * Math.sin(theta);
         
-        const colorT = t * (colorStops.length - 1);
-        const colorIdx = Math.floor(colorT);
-        const c1 = colorStops[Math.min(colorIdx, colorStops.length - 1)];
-        const c2 = colorStops[Math.min(colorIdx + 1, colorStops.length - 1)];
-        const color = c1.clone().lerp(c2, colorT - colorIdx);
-        
-        colors[i * 3] = color.r;
-        colors[i * 3 + 1] = color.g;
-        colors[i * 3 + 2] = color.b;
+        if (i === 0) {
+          ctx.moveTo(x, y);
+        } else {
+          ctx.lineTo(x, y);
+        }
       }
       
-      const geometry = new THREE.BufferGeometry();
-      geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-      geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-      
-      const material = new THREE.PointsMaterial({
-        size: 0.08,
-        vertexColors: true,
-        transparent: true,
-        opacity: 0.6,
-        sizeAttenuation: true,
-        map: createParticleTexture(64, 0.4),
-        blending: THREE.AdditiveBlending,
-        depthWrite: false
-      });
-      
-      const frameParticles = new THREE.Points(geometry, material);
-      frameSpiralGroup.add(frameParticles);
+      ctx.stroke();
+      ctx.restore();
     }
-
+    
     // ============================================
     // SCROLL HANDLING
     // ============================================
@@ -553,7 +169,7 @@
       const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
       targetScrollProgress = scrollHeight > 0 ? window.scrollY / scrollHeight : 0;
     }
-
+    
     function updateScene() {
       time += 0.008;
       
@@ -561,66 +177,28 @@
       scrollProgress += (targetScrollProgress - scrollProgress) * 0.08;
       
       // Phase definitions
-      const phase1End = 0.35;      // Initial zoom into galaxy
-      const phase2Start = 0.2;    // Name starts appearing
-      const phase2End = 0.45;      // Name fully visible
-      const phase3Start = 0.45;    // Fade transition begins
-      const phase3End = 0.70;      // Galaxy faded, bio rises
-      const phase4Start = 0.65;    // Bio content appears
+      const phase1End = 0.35;
+      const phase2Start = 0.2;
+      const phase2End = 0.45;
+      const phase3Start = 0.45;
+      const phase3End = 0.70;
+      const phase4Start = 0.65;
       
-      // Calculate zoom progress (0 to 1 during phase 1)
       const zoomProgress = Math.min(scrollProgress / phase1End, 1);
       const easedZoom = easeOutCubic(zoomProgress);
       
-      // Galaxy rotation - slow, majestic
-      if (galaxyGroup) {
-        galaxyGroup.rotation.y = time * 0.12;
-        
-        // Galaxy stays relatively flat - camera does the moving
-        galaxyGroup.rotation.x = 0;
-        
-        // SCALE UP dramatically as we zoom - galaxy spreads beyond screen
-        const baseScale = 0.5;
-        const zoomScale = easedZoom * 1.8;
-        const scale = baseScale + zoomScale;
-        galaxyGroup.scale.set(scale, scale, scale);
-        
-        // =============================================
-        // PARABOLIC CAMERA ARC
-        // Start: above and far (y=5, z=14) looking down
-        // End: level and close (y=0.5, z=3) looking into center
-        // =============================================
-        
-        // Camera Z: move forward into galaxy
-        const startZ = 14;
-        const endZ = 3;
-        camera.position.z = startZ - easedZoom * (startZ - endZ);
-        
-        // Camera Y: parabolic descent from above
-        // Using (1 - t)^2 creates a parabola that drops slowly at first, then faster
-        // We invert it: 1 - (1-t)^2 = drops fast at first, then levels out
-        const startY = 5;
-        const endY = 0.3;
-        const parabolicT = 1 - Math.pow(1 - easedZoom, 2); // Fast drop, slow finish
-        camera.position.y = startY - parabolicT * (startY - endY);
-        
-        // Camera X: slight lateral drift for dynamism (optional subtle touch)
-        camera.position.x = Math.sin(easedZoom * Math.PI * 0.3) * 0.5;
-        
-        // Point camera at galaxy center (slightly ahead of actual center for smooth tracking)
-        const lookAtY = -0.5 + easedZoom * 0.5; // Start looking down, end looking level
-        camera.lookAt(0, lookAtY, 0);
-      }
+      // Spiral animation
+      const baseRotation = time * 0.15;
+      const scrollRotation = easedZoom * Math.PI * 2;
+      const totalRotation = baseRotation + scrollRotation;
       
-      // Background stars - subtle parallax drift
-      if (starParticles) {
-        starParticles.rotation.y = time * 0.008;
-        // Stars also scale up slightly to enhance depth
-        const starScale = 1 + easedZoom * 0.3;
-        starParticles.scale.set(starScale, starScale, starScale);
-      }
+      const baseScale = 0.4;
+      const zoomScale = easedZoom * 0.8;
+      const scale = baseScale + zoomScale;
       
-      // Name reveal - DIM THE CORE when name appears
+      let spiralOpacity = 1;
+      
+      // Name reveal
       const nameReveal = document.getElementById('name-reveal');
       
       if (scrollProgress >= phase2Start && scrollProgress <= phase2End) {
@@ -629,61 +207,33 @@
         nameReveal.style.opacity = eased;
         nameReveal.style.transform = `translate(-50%, -50%) translateY(${(1 - eased) * 40}px)`;
         
-        // Dim core as name appears so text is readable
-        if (coreParticles) {
-          coreParticles.material.opacity = 0.75 * (1 - eased * 0.6);
-        }
-        
       } else if (scrollProgress < phase2Start) {
         nameReveal.style.opacity = 0;
         nameReveal.style.transform = 'translate(-50%, -50%) translateY(40px)';
-        if (coreParticles) coreParticles.material.opacity = 0.75;
         
       } else if (scrollProgress <= phase3End) {
         nameReveal.style.opacity = 1;
         nameReveal.style.transform = 'translate(-50%, -50%) translateY(0)';
-        // Keep core dimmed while name is visible
-        if (coreParticles) coreParticles.material.opacity = 0.75 * 0.4;
       }
       
-      // Phase 3: Galaxy fades out
+      // Phase 3: Fade out
       if (scrollProgress >= phase3Start) {
         const transitionProgress = Math.min((scrollProgress - phase3Start) / (phase3End - phase3Start), 1);
         const eased = easeOutCubic(transitionProgress);
         
-        // Fade all galaxy particles
-        if (armParticles) armParticles.material.opacity = 0.85 * (1 - eased * 0.95);
-        if (coreParticles) coreParticles.material.opacity = 0.3 * (1 - eased * 0.95);
-        if (dustParticles) dustParticles.material.opacity = 0.18 * (1 - eased * 0.95);
-        if (starParticles) starParticles.material.opacity = 0.9 * (1 - eased * 0.7);
+        spiralOpacity = 1 - eased * 0.95;
         
-        // Name fades out
         if (transitionProgress > 0.2) {
           const nameFade = (transitionProgress - 0.2) / 0.6;
           nameReveal.style.opacity = 1 - easeOutCubic(nameFade);
         }
-        
-        // Galaxy continues expanding but fading
-        const expandScale = (0.5 + 1.8) * (1 + eased * 0.3);
-        galaxyGroup.scale.set(expandScale, expandScale, expandScale);
-        
-        // Camera continues forward and settles level
-        camera.position.z = 3 - eased * 2;
-        camera.position.y = 0.3 * (1 - eased);
-        camera.lookAt(0, 0, 0);
-        
-      } else if (scrollProgress < phase2Start) {
-        // Reset opacities before name appears
-        if (armParticles) armParticles.material.opacity = 0.85;
-        if (coreParticles) coreParticles.material.opacity = 0.75;
-        if (dustParticles) dustParticles.material.opacity = 0.18;
-        if (starParticles) starParticles.material.opacity = 0.9;
       }
+      
+      drawSpiral(totalRotation, scale, spiralOpacity);
       
       // Phase 4: Bio content
       const bioContent = document.getElementById('bio-content');
       const photoFrame = document.getElementById('photo-frame');
-      const spiralFrameContainer = document.getElementById('spiral-frame-container');
       
       if (scrollProgress >= phase4Start) {
         const bioProgress = Math.min((scrollProgress - phase4Start) / 0.25, 1);
@@ -693,53 +243,25 @@
         bioContent.style.transform = `translateY(${(1 - eased) * 80}px)`;
         
         photoFrame.style.opacity = eased;
-        photoFrame.style.transform = `translateY(${(1 - eased) * 60}px) scale(${0.95 + eased * 0.05})`;
-        
-        spiralFrameContainer.style.opacity = eased * 0.7;
+        photoFrame.style.transform = `translateY(${(1 - eased) * 60}px)`;
         
       } else {
         bioContent.style.opacity = 0;
         bioContent.style.transform = 'translateY(80px)';
         photoFrame.style.opacity = 0;
-        photoFrame.style.transform = 'translateY(60px) scale(0.95)';
-        spiralFrameContainer.style.opacity = 0;
-      }
-      
-      // Frame spiral rotation
-      if (frameSpiralGroup) {
-        frameSpiralGroup.rotation.y = time * 0.1;
+        photoFrame.style.transform = 'translateY(60px)';
       }
     }
     
     function easeOutCubic(t) {
       return 1 - Math.pow(1 - t, 3);
     }
-
-    // ============================================
-    // ANIMATION LOOP
-    // ============================================
+    
     function animate() {
       requestAnimationFrame(animate);
       updateScene();
-      renderer.render(scene, camera);
-      
-      if (frameRenderer && frameScene && frameCamera) {
-        frameRenderer.render(frameScene, frameCamera);
-      }
     }
-
-    // ============================================
-    // RESIZE
-    // ============================================
-    function onResize() {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    }
-
-    // ============================================
-    // INIT
-    // ============================================
+    
     init();
   </script>
 </body>

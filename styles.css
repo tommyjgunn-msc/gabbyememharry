@@ -96,7 +96,7 @@ img {
   padding: 2rem 3rem;
 }
 
-106.nav-logo {
+.nav-logo {
   font-family: var(--font-body);
   font-size: 0.85rem;
   font-weight: 500;

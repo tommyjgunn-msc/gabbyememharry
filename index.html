@@ -218,7 +218,7 @@
       const easedZoom = easeOutCubic(zoomProgress);
       
       // Spiral animation - ALWAYS spinning slowly via baseRotation
-      const baseRotation = time * 0.15;  // Constant slow spin
+      const baseRotation = time * 0.45;  // Constant slow spin
       const scrollRotation = easedZoom * Math.PI * 2;  // Additional rotation on scroll
       const totalRotation = baseRotation + scrollRotation;
       

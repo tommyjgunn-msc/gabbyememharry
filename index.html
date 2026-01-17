@@ -21,6 +21,14 @@
     <canvas id="spiral-canvas"></canvas>
   </div>
 
+  <!-- Scroll Prompt -->
+  <div class="scroll-prompt" id="scroll-prompt">
+    <div class="scroll-prompt-text">
+      <span>scroll</span>
+      <div class="scroll-prompt-arrow"></div>
+    </div>
+  </div>
+
   <!-- Scroll Container -->
   <div class="scroll-container">
     
@@ -78,7 +86,7 @@
     const CONFIG = {
       colors: {
         background: '#9B461F',  // Sand/rust
-        spiral: '#6A1D2F'       // Persian plum
+        spiral: '#6A1D2F'       // Persian plum (spiral only)
       },
       spiral: {
         turns: 8,              // Number of rotations
@@ -99,12 +107,24 @@
     let time = 0;
     let centerX, centerY;
     
+    // Scroll prompt state
+    let hasScrolled = false;
+    let scrollPromptTimeout = null;
+    const scrollPrompt = document.getElementById('scroll-prompt');
+    
     function init() {
       resizeCanvas();
       window.addEventListener('resize', resizeCanvas);
       window.addEventListener('scroll', onScroll);
       onScroll();
       animate();
+      
+      // Show scroll prompt after 3.5 seconds if user hasn't scrolled
+      scrollPromptTimeout = setTimeout(() => {
+        if (!hasScrolled && window.scrollY < 50) {
+          scrollPrompt.classList.add('visible');
+        }
+      }, 3500);
     }
     
     function resizeCanvas() {
@@ -168,6 +188,16 @@
     function onScroll() {
       const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
       targetScrollProgress = scrollHeight > 0 ? window.scrollY / scrollHeight : 0;
+      
+      // Hide scroll prompt once user scrolls
+      if (window.scrollY > 50 && !hasScrolled) {
+        hasScrolled = true;
+        scrollPrompt.classList.remove('visible');
+        scrollPrompt.classList.add('hidden');
+        if (scrollPromptTimeout) {
+          clearTimeout(scrollPromptTimeout);
+        }
+      }
     }
     
     function updateScene() {
@@ -187,9 +217,9 @@
       const zoomProgress = Math.min(scrollProgress / phase1End, 1);
       const easedZoom = easeOutCubic(zoomProgress);
       
-      // Spiral animation
-      const baseRotation = time * 0.15;
-      const scrollRotation = easedZoom * Math.PI * 2;
+      // Spiral animation - ALWAYS spinning slowly via baseRotation
+      const baseRotation = time * 0.15;  // Constant slow spin
+      const scrollRotation = easedZoom * Math.PI * 2;  // Additional rotation on scroll
       const totalRotation = baseRotation + scrollRotation;
       
       const baseScale = 0.4;

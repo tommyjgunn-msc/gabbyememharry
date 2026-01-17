@@ -95,6 +95,7 @@ img {
   justify-content: space-between;
   align-items: center;
   padding: 2rem 3rem;
+  background: var(--sand);
 }
 
 .nav-logo {
@@ -256,11 +257,11 @@ img {
    SECTION 2: PHOTO + BIO
    ============================================ */
 .section-bio {
-  min-height: 150vh;
+  min-height: 100vh;
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding: 10vh 0;
+  padding: 10vh 0 5vh;
   background: transparent;
 }
 
@@ -270,7 +271,7 @@ img {
   gap: 5rem;
   max-width: 1400px;
   width: 90%;
-  padding: 4rem 0;
+  padding: 4rem 0 2rem;
   margin-top: 30vh;
   position: relative;
 }
@@ -295,12 +296,11 @@ img {
 
 .photo-caption {
   font-family: var(--font-display);
-  font-size: 0.9rem;
-  font-weight: 500;
+  font-size: 1.1rem;
+  font-weight: 600;
   color: var(--gold);
   margin-top: 1.25rem;
   letter-spacing: 0.02em;
-  opacity: 0.8;
 }
 
 .bio-content {
@@ -374,18 +374,18 @@ img {
 
 .footer-inner {
   font-family: var(--font-body);
-  font-size: 0.85rem;
+  font-size: 1rem;
+  font-weight: 500;
   letter-spacing: 0.05em;
 }
 
 .footer-inner a {
   color: var(--gold);
-  opacity: 0.8;
   transition: opacity 0.3s ease;
 }
 
 .footer-inner a:hover {
-  opacity: 1;
+  opacity: 0.8;
 }
 
 .footer-sep {
@@ -491,7 +491,6 @@ img {
   align-items: center;
   padding: 2rem 3rem;
   background: var(--sand);
-  border-bottom: 1px solid var(--gold-muted);
 }
 
 .works-nav .nav-logo {

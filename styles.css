@@ -9,15 +9,16 @@
 @import url('https://api.fontshare.com/v2/css?f[]=clash-display@200,300,400,500,600,700&display=swap');
 
 /* ============================================
-   CSS VARIABLES - TWO COLORS ONLY
+   CSS VARIABLES
    ============================================ */
 :root {
-  /* Gabrielle's chosen palette */
+  /* Color palette */
   --sand: #9B461F;        /* Background */
-  --plum: #6A1D2F;        /* Text */
+  --plum: #6A1D2F;        /* Spiral only */
+  --gold: #DEA450;        /* All text */
   
   /* Muted variant for secondary text */
-  --plum-muted: rgba(106, 29, 47, 0.7);
+  --gold-muted: rgba(222, 164, 80, 0.7);
   
   /* Typography */
   --font-display: 'Clash Display', 'Helvetica Neue', sans-serif;
@@ -44,13 +45,13 @@ html {
 body {
   font-family: var(--font-body);
   background: var(--sand);
-  color: var(--plum);
+  color: var(--gold);
   line-height: 1.6;
   overflow-x: hidden;
 }
 
 ::selection {
-  background: var(--plum);
+  background: var(--gold);
   color: var(--sand);
 }
 
@@ -91,7 +92,7 @@ img {
   right: 0;
   z-index: 100;
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: center;
   padding: 2rem 3rem;
 }
@@ -100,8 +101,8 @@ img {
   font-family: var(--font-display);
   font-size: 0.85rem;
   font-weight: 500;
-  letter-spacing: 0.08em;
-  color: var(--plum);
+  letter-spacing: 0.02em;
+  color: var(--gold);
   transition: opacity 0.3s ease;
 }
 
@@ -115,7 +116,7 @@ img {
   font-weight: 500;
   letter-spacing: 0.08em;
   text-transform: lowercase;
-  color: var(--plum);
+  color: var(--gold);
   position: relative;
   padding-bottom: 2px;
 }
@@ -127,12 +128,76 @@ img {
   left: 0;
   width: 0;
   height: 1px;
-  background: var(--plum);
+  background: var(--gold);
   transition: width 0.4s var(--ease-out-expo);
 }
 
 .nav-link:hover::after {
   width: 100%;
+}
+
+/* ============================================
+   SCROLL PROMPT
+   ============================================ */
+.scroll-prompt {
+  position: fixed;
+  bottom: 3rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+  pointer-events: none;
+}
+
+.scroll-prompt.visible {
+  opacity: 1;
+}
+
+.scroll-prompt.hidden {
+  opacity: 0;
+}
+
+.scroll-prompt-text {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: 0.15em;
+  text-transform: lowercase;
+  color: var(--gold);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.scroll-prompt-arrow {
+  width: 1px;
+  height: 24px;
+  background: var(--gold);
+  position: relative;
+  animation: scrollBounce 2s ease-in-out infinite;
+}
+
+.scroll-prompt-arrow::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+  width: 8px;
+  height: 8px;
+  border-right: 1px solid var(--gold);
+  border-bottom: 1px solid var(--gold);
+}
+
+@keyframes scrollBounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(8px);
+  }
 }
 
 /* ============================================
@@ -174,11 +239,11 @@ img {
 
 .name {
   font-family: var(--font-display);
-  font-weight: 500;  /* Lighter weight per Gabrielle's feedback */
+  font-weight: 500;
   font-size: clamp(2.2rem, 7vw, 5.5rem);
   line-height: 1;
   letter-spacing: -0.02em;
-  color: var(--plum);
+  color: var(--gold);
   text-transform: lowercase;
   white-space: nowrap;
 }
@@ -221,8 +286,6 @@ img {
   transition: opacity 0.8s ease, transform 0.8s var(--ease-out-expo);
 }
 
-/* NO BORDERS - clean and simple per Gabrielle's request */
-
 .photo {
   width: 100%;
   max-width: 500px;
@@ -234,7 +297,7 @@ img {
   font-family: var(--font-display);
   font-size: 0.9rem;
   font-weight: 500;
-  color: var(--plum);
+  color: var(--gold);
   margin-top: 1.25rem;
   letter-spacing: 0.02em;
   opacity: 0.8;
@@ -267,7 +330,7 @@ img {
   font-family: var(--font-body);
   font-size: 1rem;
   line-height: 1.8;
-  color: var(--plum-muted);
+  color: var(--gold-muted);
   font-weight: 400;
 }
 
@@ -275,12 +338,12 @@ img {
   font-family: var(--font-display);
   font-size: 1.2rem;
   font-weight: 500;
-  color: var(--plum);
+  color: var(--gold);
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
   padding-top: 2rem;
-  border-top: 1px solid var(--plum-muted);
+  border-top: 1px solid var(--gold-muted);
   margin-top: 1rem;
   transition: opacity 0.3s ease;
 }
@@ -316,7 +379,7 @@ img {
 }
 
 .footer-inner a {
-  color: var(--sand);
+  color: var(--gold);
   opacity: 0.8;
   transition: opacity 0.3s ease;
 }
@@ -327,7 +390,7 @@ img {
 
 .footer-sep {
   margin: 0 1.5rem;
-  color: var(--sand);
+  color: var(--gold);
   opacity: 0.4;
 }
 
@@ -377,6 +440,10 @@ img {
   .footer {
     padding: 3rem 2rem;
   }
+  
+  .scroll-prompt {
+    bottom: 2rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -404,7 +471,7 @@ img {
   font-family: var(--font-display);
   font-size: clamp(2.5rem, 6vw, 4rem);
   font-weight: 500;
-  color: var(--sand);
+  color: var(--gold);
   letter-spacing: -0.01em;
 }
 
@@ -420,25 +487,29 @@ img {
   right: 0;
   z-index: 100;
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: center;
   padding: 2rem 3rem;
   background: var(--sand);
-  border-bottom: 1px solid var(--plum-muted);
+  border-bottom: 1px solid var(--gold-muted);
+}
+
+.works-nav .nav-logo {
+  color: var(--gold);
 }
 
 .works-nav .nav-link {
-  color: var(--plum);
+  color: var(--gold);
 }
 
 .works-nav .nav-link::after {
-  background: var(--plum);
+  background: var(--gold);
 }
 
 /* Works Sections */
 .works-section {
   padding: 4rem 6rem;
-  border-bottom: 1px solid var(--plum-muted);
+  border-bottom: 1px solid var(--gold-muted);
 }
 
 .works-section:last-child {
@@ -458,9 +529,9 @@ img {
   font-weight: 600;
   letter-spacing: 0.15em;
   text-transform: uppercase;
-  color: var(--plum-muted);
+  color: var(--gold-muted);
   padding-top: 0.5rem;
-  border-top: 2px solid var(--plum);
+  border-top: 2px solid var(--gold);
 }
 
 /* Books */
@@ -478,7 +549,7 @@ img {
   font-family: var(--font-display);
   font-size: 1.4rem;
   font-weight: 500;
-  color: var(--plum);
+  color: var(--gold);
   transition: opacity 0.3s ease;
   display: inline-block;
 }
@@ -489,7 +560,7 @@ img {
 
 .book-note {
   font-family: var(--font-body);
-  color: var(--plum-muted);
+  color: var(--gold-muted);
   font-size: 0.9rem;
   margin-top: 0.25rem;
 }
@@ -520,7 +591,7 @@ img {
 
 .publication-item {
   padding-bottom: 1.5rem;
-  border-bottom: 1px solid rgba(106, 29, 47, 0.15);
+  border-bottom: 1px solid rgba(222, 164, 80, 0.2);
 }
 
 .publication-item:last-child {
@@ -531,12 +602,12 @@ img {
   font-family: var(--font-display);
   font-weight: 500;
   font-size: 1.1rem;
-  color: var(--plum);
+  color: var(--gold);
 }
 
 .publication-item .venue {
   font-family: var(--font-body);
-  color: var(--plum-muted);
+  color: var(--gold-muted);
   font-size: 0.9rem;
   margin-top: 0.25rem;
 }
@@ -544,7 +615,7 @@ img {
 .publication-item .note {
   font-family: var(--font-body);
   font-size: 0.85rem;
-  color: var(--plum);
+  color: var(--gold);
   opacity: 0.8;
   margin-top: 0.25rem;
 }
@@ -556,7 +627,7 @@ img {
   font-weight: 600;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--plum-muted);
+  color: var(--gold-muted);
   margin: 3rem 0 1.5rem;
 }
 
@@ -595,7 +666,7 @@ img {
   font-size: 0.95rem;
   font-weight: 500;
   margin-top: 0.75rem;
-  color: var(--plum);
+  color: var(--gold);
 }
 
 /* Works Page Footer */
